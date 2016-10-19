@@ -5,7 +5,7 @@ module.exports = function(grunt) {
     jsdoc: {
         dist : {
             options: {
-              configure : "./doc/conf.json",
+              configure : "./doc/jsdoc.conf.json",
                 // destination: 'doc/api',
                 // template: "./node_modules/minami",
                 // template: "./node_modules/loke-jsdoc-theme",
