@@ -5,7 +5,7 @@ module.exports = function(grunt) {
     jsdoc: {
         dist : {
             options: {
-              configure : "./src/conf.json",
+              configure : "./doc/conf.json",
                 // destination: 'doc/api',
                 // template: "./node_modules/minami",
                 // template: "./node_modules/loke-jsdoc-theme",
@@ -14,13 +14,34 @@ module.exports = function(grunt) {
             }
         }
     },
+    copy: {
+      src:
+        {
+          cwd: './src',  // set working folder / root to copy
+          src: '**/*',           // copy all files and subfolders
+          dest: './doc/api/dist/src',    // destination folder
+          expand: true           // required when using cwd
+        },
+      lib: {
+          cwd: './lib',  // set working folder / root to copy
+          src: '**/*',           // copy all files and subfolders
+          dest: './doc/api/dist/lib',    // destination folder
+          expand: true           // required when using cwd
+        },
+      css: {
+          cwd: './css',  // set working folder / root to copy
+          src: '**/*',           // copy all files and subfolders
+          dest: './doc/api/dist/css',    // destination folder
+          expand: true           // required when using cwd
+        },
+    }
   });
 
-
   grunt.loadNpmTasks('grunt-jsdoc');
+  grunt.loadNpmTasks('grunt-contrib-copy');
 
   // grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.registerTask('default', ['jsdoc']);
+  grunt.registerTask('default', ['jsdoc', 'copy']);
 
 };
 

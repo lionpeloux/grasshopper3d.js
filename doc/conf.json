@@ -37,7 +37,7 @@
     "search"                : true,
     "default": {
       "staticFiles": {
-        "include": ["./doc/static"]
+        "include": []
       }
     }
   }

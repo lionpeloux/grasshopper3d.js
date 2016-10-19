@@ -40,12 +40,12 @@ p1.print()
 
 
 <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/snap.svg/0.4.1/snap.svg.js'></script>
-<script type='text/javascript' src='../../lib/matrix.js'></script>
-<script type='text/javascript' src='../../lib/vector.js'></script>
-<script type='text/javascript' src='../../src/ghparam.js'></script>
-<script type='text/javascript' src='../../src/ghcomp.js'></script>
-<script type='text/javascript' src='../../src/ghsvg.js'></script>
-<link rel='stylesheet' type='text/css' href='../tutorials/test.css'>
+<script type='text/javascript' src='dist/lib/lib/matrix.js'></script>
+<script type='text/javascript' src='dist/lib/vector.js'></script>
+<script type='text/javascript' src='dist/src/ghparam.js'></script>
+<script type='text/javascript' src='dist/src/ghcomp.js'></script>
+<script type='text/javascript' src='dist/src/ghsvg.js'></script>
+<link rel='stylesheet' type='text/css' href='dist/css/tutorials.css'>
 <script>
   // Define the paper sheet
   var width = 250;
