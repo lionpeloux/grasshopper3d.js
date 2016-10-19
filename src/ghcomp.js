@@ -13,20 +13,46 @@
  */
 class GHComp {
   constructor(id, name){
-    this.id = id          // unique id = 0, ..., N
-    this.name = name      // component name
-    this.isupdated = true // false if the value is waiting to be computed
-    this.param_in = []    // register all input parameters
-    this.param_out = []   // register all output parameters
+    this.id = id              // unique id = 0, ..., N
+    this.name = name          // component name
+    this.isupdated = true     // false if the value is waiting to be computed
+    this.param_in = []        // register all input parameters
+    this.param_out = []       // register all output parameters
   }
 }
 Object.defineProperties(GHComp.prototype, {
+  'register_in': { // resgister an input parameter and bind it to the component
+    configurable: false,
+    value: function(param) {
+      this.param_in.push(param)
+      param.register_comp(this)
+      return param
+    }
+  },
+  'register_out': { // resgister an output parameter no needs to bind
+    configurable: false,
+    value: function(param) {
+      this.param_out.push(param)
+      return param
+    }
+  },
   'refresh': {
     configurable: true,
     value: function() {return ""} // to be overrided in components
   },
   'spreadRefresh': {
+    configurable: false,
     value: function() {
+
+      // wait till all input parameters have been refreshed
+      for (var i = 0; i < this.param_in.length; i++) {
+        if (this.param_in[i].isupdated == false) { console.log("------ NON "); return}
+      }
+
+      // refresh should not be propagated more than once
+      if (this.isupdated == true) { return }
+
+      // otherwise, the component is ready to be refreshed
       this.refresh()
       this.isupdated = true
       console.log("Comp[" + this.id + "] : isupdated = " + this.isupdated)
@@ -36,7 +62,12 @@ Object.defineProperties(GHComp.prototype, {
     }
   },
   'spreadStatut': {
+    configurable: false,
     value: function() {
+      // statut should not be propagated more than once
+      if (this.isupdated == false) { return }
+
+      // otherwise, the component is hit by a statut switch and must propagate the spreadStatut process
       this.isupdated = false
       console.log("Comp[" + this.id + "] : isupdated = " + this.isupdated)
       for (var i = 0; i < this.param_out.length; i++) {
@@ -46,20 +77,20 @@ Object.defineProperties(GHComp.prototype, {
   }
 })
 
-// Mid Point
+// Mid point from two GHPoints
 class GHComp_Pts_Mid extends GHComp {
   constructor(id, p1, p2){
     super(id, "Midpoint")
-    this.p1 = p1
-    this.param_in.push(p1)
-    p1.comp_out.push(this)
 
-    this.p2 = p2
-    this.param_in.push(p2)
-    p2.comp_out.push(this)
+    // register input parameters
+    this.p1 = this.register_in(p1)
+    this.p2 = this.register_in(p2)
 
-    this.pmid = new GHPoint('C', (p1.x + p2.x)/2, (p1.y + p2.y)/2, (p1.z + p2.z)/2)
-    this.param_out.push(this.pmid)
+    // register output parameters
+    this.pmid = this.register_out(new GHPoint(id, 0,0,0))
+
+    // trigger computation
+    this.refresh()
   }
 }
 Object.defineProperties(GHComp_Pts_Mid.prototype, {
@@ -67,6 +98,41 @@ Object.defineProperties(GHComp_Pts_Mid.prototype, {
     get: function() { return this.pmid },
   },
   'refresh': {
-    value: function() { this.pmid._setData((this.p1.x + this.p2.x)/2, (this.p1.y + this.p2.y)/2, (this.p1.z + this.p2.z)/2) },
+    value: function() {
+      this.pmid._setData((this.p1.x + this.p2.x)/2, (this.p1.y + this.p2.y)/2, (this.p1.z + this.p2.z)/2)
+    },
+  },
+})
+
+// Polyline from several GHPoints
+class GHComp_Polyline extends GHComp {
+  constructor(id, points){
+    super(id, "Polyline from Points")
+
+    // register input parameters
+    for (var i = 0; i < points.length; i++) {
+      this.register_in(points[i])
+    }
+
+    // register output parameters
+    var points_tmp = []
+    for (var i = 0; i < points.length; i++) { points_tmp.push(new Vector(0,0,0))}
+    this.polyline = this.register_out(new GHPolyline('id', points_tmp))
+
+    // trigger computation
+    this.refresh()
+  }
+}
+Object.defineProperties(GHComp_Polyline.prototype, {
+  'polyline': {
+    get: function() { return this.polyline },
+  },
+  'refresh': {
+    value: function() {
+      for (var i = 0; i < this.register_in.length; i++) {
+        var pt = this.register_in[i].getData()
+      }
+      // this.pmid._setData((this.p1.x + this.p2.x)/2, (this.p1.y + this.p2.y)/2, (this.p1.z + this.p2.z)/2)
+    },
   },
 })

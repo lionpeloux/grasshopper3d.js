@@ -11,14 +11,14 @@ class GHSvg {
     this.name = name        // component name
     this.snap = snap        // reference to snap object
     this.isupdated = true   // false if the value is waiting to be computed
-    this.param = param  // register all input parameters
-    this.svgobj = ""
+    this.param = param      // register binded parameter
+    this.svgobj = undefined // a snapsvg element
   }
 }
 Object.defineProperties(GHSvg.prototype, {
   'refresh': {
     configurable: true,
-    value: function() {return ""} // to be overrided in components
+    value: function() {} // to be overrided in components
   },
   'spreadRefresh': {
     value: function() {
@@ -45,7 +45,7 @@ class GHSvg_Point extends GHSvg {
     // deal with options
     var r = 10
     if (options.r !== undefined) r = options.r
-    this.svgobj = paper.circle(this.point.x,this.point.y,r)
+    this.svgobj = paper.circle(this.point.x,this.point.y,0).animate({r: r}, 500, mina.bounce)
     if (options.cl !== undefined) this.svgobj.addClass(options.cl)
     if (options.grp !== undefined) options.grp.add(this.svgobj)
 
@@ -65,16 +65,13 @@ Object.defineProperties(GHSvg_Point.prototype, {
     },
   },
 })
-
 var dragStart = function ( x,y,ev ) {
   var sender = this.data('sender')
 
   // store the origin at clic
   this.data('ox', sender.point.x)
   this.data('oy', sender.point.y)
-
 }
-
 var dragMove = function(dx, dy, x, y, e) {
 
         var sender = this.data('sender')
@@ -87,8 +84,5 @@ var dragMove = function(dx, dy, x, y, e) {
         // sender.svgobj.attr({cx:this.data('ox') + tdx, cy:this.data('oy') + tdy})
         // sender.point.setData(this.data('ox') + tdx, this.data('oy') + tdy, 0)
         sender.point.setData(this.data('ox') + tdx, this.data('oy') + tdy, 0)
-
 }
-
-var dragEnd = function() {
-}
+var dragEnd = function() {}

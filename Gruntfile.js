@@ -34,14 +34,22 @@ module.exports = function(grunt) {
           dest: './doc/api/dist/css',    // destination folder
           expand: true           // required when using cwd
         },
-    }
+    },
+    connect: {
+			example: {
+				port: 1337,
+				base: './doc/api/index.html'
+			}
+		}
   });
 
   grunt.loadNpmTasks('grunt-jsdoc');
   grunt.loadNpmTasks('grunt-contrib-copy');
-
+  grunt.loadNpmTasks('grunt-serve');
   // grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.registerTask('default', ['jsdoc', 'copy']);
+  grunt.registerTask('connect', ['connect']);
+
 
 };
 

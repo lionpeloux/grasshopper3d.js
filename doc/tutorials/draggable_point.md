@@ -61,7 +61,7 @@ p1.print()
 
   // draw svg border box as a rectangle
   var box = paper.rect(-width/2, -height/2, width, height)
-                 .attr({strokeWidth:'1px', stroke:'black', fill:'none'})
+                 .attr({strokeWidth:'2px', stroke:'black', fill:'none'})
   g.add(box)
 
   // Create new Point parameter
