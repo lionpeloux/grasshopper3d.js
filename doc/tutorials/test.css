@@ -1,0 +1,33 @@
+#frame{
+    border: 1px solid red;
+}
+
+.node {
+	/*-moz-border-radius: 1.418px 1.417px 1.418px 1.417px / 1.417px 1.417px 1.417px 1.417px;
+	-webkit-border-radius: 1.418px 1.417px 1.418px 1.417px / 1.417px 1.417px 1.417px 1.417px;
+	border-radius: 1.418px 1.417px 1.418px 1.417px / 1.417px 1.417px 1.417px 1.417px;*/
+	fill: red;
+  stroke: red;
+  stroke-width: 4;
+  stroke-opacity: .2;
+}
+
+.circle {
+	/*-moz-border-radius: 1.418px 1.417px 1.418px 1.417px / 1.417px 1.417px 1.417px 1.417px;
+	-webkit-border-radius: 1.418px 1.417px 1.418px 1.417px / 1.417px 1.417px 1.417px 1.417px;
+	border-radius: 1.418px 1.417px 1.418px 1.417px / 1.417px 1.417px 1.417px 1.417px;*/
+	fill: transparent;
+    stroke: grey;
+    strokeWidth: 1;
+    strokeOpacity: .4;
+}
+
+.line{
+    stroke:blue;
+}
+
+.shadow {
+    cursor:crosshair;
+    -moz-box-shadow: -5px -5px 5px #888;
+    -webkit-box-shadow: -5px -5px 5px #888;
+    box-shadow: -5px -5px 5px #888; }

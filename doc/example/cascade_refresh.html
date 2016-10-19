@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/snap.svg/0.4.1/snap.svg.js"></script>
+    <script type="text/javascript" src="../../lib/matrix.js"></script>
+    <script type="text/javascript" src="../../lib/vector.js"></script>
+    <script type="text/javascript" src="../../src/ghparam.js"></script>
+    <script type="text/javascript" src="../../src/ghcomp.js"></script>
+    <script type="text/javascript" src="../../src/ghsvg.js"></script>
+    <link rel="stylesheet" type="text/css" href="./test.css">
+</head>
+<body>
+  <script>
+
+    var width = 250;
+    var height = 125;
+    var paper = Snap(width,height);
+
+    var g = paper.g();
+    g.attr({id:"cartesian"});
+    g.attr({transform:"translate("+width/2+","+height/2+") scale(1,-1)"});
+    var box = paper.rect(-width/2, -height/2, width, height).attr({strokeWidth:"1px", stroke:"black", fill:"none"})
+    g.add(box)
+
+    var p1 = new GHPoint('Point A', 0,0,0)
+    var p1_svg = new GHSvg_Point(paper, 'PointA',p1, {grp:g, r:20, cl:"node"})
+    // g.add(p1_svg.svg
+    // var p2 = new GHPoint('Point D', 100,0,0)
+    // var comp1 = new GHComp_Pts_Mid('Comp 1', p1,p2)
+    // comp1.midpoint.id = 'Point B'
+    //
+    // var comp2 = new GHComp_Pts_Mid('Comp 2', comp1.midpoint,p2)
+    // comp2.midpoint.id = 'Point C'
+    //
+    // p1.print()
+    // comp1.midpoint.print()
+    // comp2.midpoint.print()
+    // p2.print()
+    //
+    // console.log("=======");
+    p1.x = 100
+    p1.y = 50
+    // console.log("=======");
+    // p1.print()
+    // comp1.midpoint.print()
+    // comp2.midpoint.print()
+    // p2.print()
+    //
+    // // p1.x = 0
+    // console.log("=======");
+    // p1.print()
+    // comp1.midpoint.print()
+    // comp2.midpoint.print()
+    // p2.print()
+
+  </script>
+</body>
+</html>

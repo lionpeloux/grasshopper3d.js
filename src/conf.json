@@ -1,0 +1,44 @@
+{
+  "tags": {
+      "allowUnknownTags": true,
+      "dictionaries": ["jsdoc","closure"]
+  },
+  "source": {
+      "include": ["src/", "README.md"],
+      "exclude": [],
+      "includePattern": ".+\\.js(doc|x)?$",
+      "excludePattern": "(^|\\/|\\\\)_"
+  },
+  "plugins": ["plugins/markdown"],
+  "opts": {
+      "template": "./node_modules/ink-docstrap/template",
+      "tutorials": "./doc/tutorials/",
+      "encoding": "utf8",
+      "destination": "./doc/api",
+      "recurse": true,
+      "query": "value",
+      "private": true,
+      "lenient": true
+  },
+  "templates": {
+    "systemName"            : "grasshopper3d.js",
+    "footer"                : "",
+    "copyright"             : "Lionel du Peloux",
+    "includeDate"           : "2016",
+    "navType"               : "inline",
+    "theme"                 : "cosmo",
+    "linenums"              : true,
+    "collapseSymbols"       : true,
+    "inverseNav"            : true,
+    "outputSourceFiles"     : true,
+    "outputSourcePath"      : false,
+    "syntaxTheme"           : "default",
+    "sort"                  : true,
+    "search"                : true,
+    "default": {
+      "staticFiles": {
+        "include": ["./doc/static"]
+      }
+    }
+  }
+}
