@@ -1,5 +1,8 @@
 {
   "draggable_point": {
     "title": "Draggable Point"
+  },
+  "cube3d": {
+    "title": "3D Cube "
   }
 }

@@ -10,7 +10,9 @@ var width = 250;
 var height = 125;
 var paper = Snap(width,height);
 paper.attr({style:'display:block; margin:auto'})
-Snap('#main').append(paper)
+Snap('#example').append(paper)
+
+var proj = Matrix.identity()
 
 // create a master group to switch to cartesian coordinates
 var g = paper.g();
@@ -26,7 +28,7 @@ g.add(box)
 var p1 = new GHPoint('Point A', 0,0,0)
 
 // Attach an SVG circle to this point
-var p1_svg = new GHSvg_Point(paper, 'PointA',p1, {grp:g, r:20, cl:'node'})
+var p1_svg = new GHSvg_Point(paper, 'PointA',p1, 20).toGroup(g).addClass("node")
 
 // move p1 to (100, 0, 0)
 p1.x = 100
@@ -40,7 +42,7 @@ p1.print()
 
 
 <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/snap.svg/0.4.1/snap.svg.js'></script>
-<script type='text/javascript' src='dist/lib/lib/matrix.js'></script>
+<script type='text/javascript' src='dist/lib/matrix.js'></script>
 <script type='text/javascript' src='dist/lib/vector.js'></script>
 <script type='text/javascript' src='dist/src/ghparam.js'></script>
 <script type='text/javascript' src='dist/src/ghcomp.js'></script>
@@ -53,6 +55,9 @@ p1.print()
   var paper = Snap(width,height);
   paper.attr({style:'display:block; margin:auto'})
   Snap('#example').append(paper)
+
+  var proj = Matrix.identity()
+
 
   // create a master group to switch to cartesian coordinates
   var g = paper.g();
@@ -68,7 +73,7 @@ p1.print()
   var p1 = new GHPoint('Point A', 0,0,0)
 
   // Attach an SVG circle to this point
-  var p1_svg = new GHSvg_Point(paper, 'PointA',p1, {grp:g, r:20, cl:'node'})
+  var p1_svg = new GHSvg_Point(paper, 'PointA',p1, 20).toGroup(g).addClass("node")
 
   // move p1 to (100, 0, 0)
   p1.x = 100
