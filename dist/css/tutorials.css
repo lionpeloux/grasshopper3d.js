@@ -12,6 +12,19 @@
   stroke-opacity: .2;
 }
 
+.cube {
+	/*-moz-border-radius: 1.418px 1.417px 1.418px 1.417px / 1.417px 1.417px 1.417px 1.417px;
+	-webkit-border-radius: 1.418px 1.417px 1.418px 1.417px / 1.417px 1.417px 1.417px 1.417px;
+	border-radius: 1.418px 1.417px 1.418px 1.417px / 1.417px 1.417px 1.417px 1.417px;*/
+  fill: grey;
+  fill-opacity: 0.3;
+  stroke: black;
+  stroke-width: 2;
+  stroke-opacity: 1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .circle {
 	/*-moz-border-radius: 1.418px 1.417px 1.418px 1.417px / 1.417px 1.417px 1.417px 1.417px;
 	-webkit-border-radius: 1.418px 1.417px 1.418px 1.417px / 1.417px 1.417px 1.417px 1.417px;
@@ -23,7 +36,10 @@
 }
 
 .line{
-    stroke:blue;
+    fill: none;
+    stroke: black;
+    stroke-width: 2;
+    stroke-opacity: .6;
 }
 
 .shadow {

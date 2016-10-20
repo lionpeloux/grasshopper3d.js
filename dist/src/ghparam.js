@@ -17,11 +17,26 @@ class GHParam {
     this.type = type        // param type
     this.isupdated = true   // false if the value is waiting to be computed
     this.comp_out = []      // register all dependents components
+    this.svg_out = []       // register all dependents svgobj
   }
 }
 Object.defineProperties(GHParam.prototype, {
+  'register_comp': { // register an output parameter no needs to bind
+    configurable: false,
+    value: function(comp) {
+      this.comp_out.push(comp)
+      return comp
+    }
+  },
+  'register_svg': { // register an svg parameter no needs to bind
+    configurable: false,
+    value: function(svg) {
+      this.svg_out.push(svg)
+      return svg
+    }
+  },
   'hasChanged': { // raise "hasChanged" event => compute new statuts and recompute solution
-    value: function() {this.spreadStatut(); this.spreadRefresh()}
+    value: function() {console.log("==== STATUT ==== "); this.spreadStatut(); console.log("==== REFERSH ==== "); this.spreadRefresh()}
   },
   'refresh': {
     value: function() {}
@@ -35,6 +50,9 @@ Object.defineProperties(GHParam.prototype, {
       for (var i = 0; i < this.comp_out.length; i++) {
         this.comp_out[i].spreadRefresh()
       }
+      for (var i = 0; i < this.svg_out.length; i++) {
+        this.svg_out[i].spreadRefresh()
+      }
     }
   },
   'spreadStatut': {
@@ -43,6 +61,9 @@ Object.defineProperties(GHParam.prototype, {
       console.log('Param[' + this.id + '] : isupdated = ' + this.isupdated)
       for (var i = 0; i < this.comp_out.length; i++) {
         this.comp_out[i].spreadStatut()
+      }
+      for (var i = 0; i < this.svg_out.length; i++) {
+        this.svg_out[i].spreadStatut()
       }
     }
   }
@@ -58,25 +79,44 @@ class GHPoint extends GHParam {
   }
 }
 Object.defineProperties(GHPoint.prototype, {
+  '_x': {
+    set: function(val) {
+      this.point.x = val
+    }
+  },
   'x': {
     get: function() { return this.point.x },
-    set: function(val) { this.point.x = val;
-      console.log("=== STATUT ===");
-      this.spreadStatut();
-      console.log("=== REFRESH ===");
-      this.spreadRefresh()
+    set: function(val) {
+      this.point.x = val
+      this.hasChanged()
+    }
+  },
+  '_y': {
+    set: function(val) {
+      this.point.y = val
     }
   },
   'y': {
     get: function() { return this.point.y },
-    set: function(val) { this.point.y = val; this.hasChanged()}
+    set: function(val) {
+      this.point.y = val
+      this.hasChanged()
+    }
+  },
+  '_z': {
+    set: function(val) {
+      this.point.z = val
+    }
   },
   'z': {
     get: function() { return this.point.z },
-    set: function(val) { this.point.z = val; this.hasChanged()}
+    set: function(val) {
+      this.point.z = val
+      this.hasChanged()
+    }
   },
   'getData': {
-    value: function() { return this.point; this.hasChanged()}
+    value: function() { return this.point }
   },
   'setData': {
     value: function(x,y,z) { this.point.x=x; this.point.y=y; this.point.z=z; this.hasChanged()}
@@ -120,8 +160,7 @@ Object.defineProperties(GHPolyline.prototype, {
       for (var i = 0; i < points.length; i++) {
         this.points.push(new Vector(points[i].x, points[i].y, points[i].z))
       }
-      this.spreadStatut()
-      this.spreadRefresh()
+      this.hasChanged()
     }
   },
   '_setData': {
@@ -136,97 +175,9 @@ Object.defineProperties(GHPolyline.prototype, {
     value: function() {
       console.log("Polyline[" + this.count + "]")
       for (var i = 0; i < this.points.length; i++) {
-        console.log("Point[" + i + "] : (" + this.point.x + ", " + this.point.y + ", " + this.point.z + ")")
+        var point = this.points[i]
+        console.log("Point[" + i + "] : (" + point.x + ", " + point.y + ", " + point.z + ")")
       }
     }
   }
 })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// function GHParam() {
-//   this.id = -1          // unique id = 0, ..., N
-//   this.type = ""        // param type
-//   this.isupdated = true // false if the value is waiting to be computed
-//   this.comp_out = []    // register all dependents components
-// }
-// Object.defineProperties(GHParam.prototype, {
-//   'refresh': {
-//     value: function() {}
-//   },
-//   'spread_refresh': {
-//     value: function() {
-//       this.refresh()
-//       this.isupdated = true
-//       for (var i = 0; i < this.comp_out.length; i++) {
-//         this.comp_out[i].refresh()
-//       }
-//     }
-//   },
-//   'spread_statut': {
-//     value: function() {
-//       this.isupdated = false
-//       console.log("Param[" + this.id + "] : isupdated = " + this.isupdated)
-//       for (var i = 0; i < this.comp_out.length; i++) {
-//         this.comp_out[i].spread_statut()
-//       }
-//     }
-//   }
-// })
-//
-// // Number Parameter
-// function GHNumber(number) {
-//   this.type = "Number"
-//   this.value = number
-// }
-// GHNumber.prototype = new GHParam // Inheritence from GHParam
-//
-// Object.defineProperties(GHNumber.prototype, {
-//   'value': {
-//     get: function() { return this.value },
-//     set: function(val) { this.value = val; this.spread_refresh()}
-//   },
-//   'print': {
-//     value: function() { console.log("Number : " + this.value) }
-//   }
-// })
-//
-// // Point Parameter
-// function GHPoint(x,y,z) {
-//   this.type = "Point"
-//   this.point = new Vector(x,y,z)
-// }
-// GHPoint.prototype = new GHParam // Inheritence from GHParam
-//
-// Object.defineProperties(GHPoint.prototype, {
-//   'x': {
-//     get: function() { return this.point.x },
-//     set: function(val) { this.point.x = val; this.spread_statut();}
-//   },
-//   'y': {
-//     get: function() { return this.point.y },
-//     set: function(val) { this.point.y = val; this.spread_refresh()}
-//   },
-//   'z': {
-//     get: function() { return this.point.z },
-//     set: function(val) { this.point.z = val; this.spread_refresh()}
-//   },
-//   'value': {
-//     get: function() { return this.point },
-//     set: function(x,y,z) { this.point.x=x, this.point.y=y, this.point.z=z, this.spread_refresh()}
-//   },
-//   'print': {
-//     value: function() { console.log("Point[" + this.id + "] : (" + this.point.x + ", " + this.point.y + ", " + this.point.z + ")") }
-//   }
-// })
