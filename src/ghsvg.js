@@ -17,15 +17,23 @@ class GHSvg {
 }
 Object.defineProperties(GHSvg.prototype, {
   'register_param': {           // register the binded parameter
-    configurable: false,
     value: function(param) {
       param.register_svg(this)
       return param
     }
   },
-  'attr': {           // register the binded parameter
-    configurable: true,
-    value: function(options) {}
+  'attr': {
+    value: function(options) {this.svgobj.attr(options); console.log("atttrr");console.log(options);return this}
+  },
+  'addClass': {
+    value: function(str) {this.svgobj.addClass(str); return this}
+  },
+  'toGroup': {
+    value: function(grp) { grp.add(this.svgobj); return this}
+  },
+  'svg': {
+    get: function() { return this.svgobj },
+    set: function(val) { return this.svgobj = val },
   },
   'refresh': {
     configurable: true,
@@ -48,18 +56,16 @@ Object.defineProperties(GHSvg.prototype, {
 
 // Add a SVG Circle to a GHPoint
 class GHSvg_Point extends GHSvg {
-  constructor(snap, id, point, options){
+  constructor(snap, id, point, r=20){
     super(snap, id, "SVGPoint", point)
 
     // create an alias
     this.point = this.param
 
     // deal with options
-    var r = 10
-    if (options.r !== undefined) r = options.r
-    this.svgobj = paper.circle(this.point.x,this.point.y,0).animate({r: r}, 500, mina.bounce)
-    if (options.cl !== undefined) this.svgobj.addClass(options.cl)
-    if (options.grp !== undefined) options.grp.add(this.svgobj)
+    var pt = proj.transformVector(this.point)
+    this.svgobj = paper.circle(pt.x,pt.y,0)
+                        .animate({r: r}, 800, mina.bounce)
 
     // mouse events
     this.svgobj.data('sender', this);
@@ -67,13 +73,12 @@ class GHSvg_Point extends GHSvg {
   }
 }
 Object.defineProperties(GHSvg_Point.prototype, {
-  'svg': {
-    get: function() { return this.svgobj },
-    set: function(val) { return this.svgobj = val },
-  },
   'refresh': {
     value: function() {
-      this.svgobj.attr({cx:this.point.x, cy:this.point.y})
+      var pt = proj.transformVector(this.point)
+      this.svgobj.attr({cx:pt.x, cy:pt.y})
+
+      // this.svgobj.attr({cx:this.point.x, cy:this.point.y})
     },
   },
 })
@@ -101,7 +106,7 @@ var dragEnd = function() {}
 
 // Add a SVG Polyline to a GHPolyline
 class GHSvg_Polyline extends GHSvg {
-  constructor(snap, id, polyline, options){
+  constructor(snap, id, polyline){
     super(snap, id, "SVGPolyline", polyline)
 
     // create an alias
@@ -111,19 +116,11 @@ class GHSvg_Polyline extends GHSvg {
     var path = this.svgPath(this.polyline.points)
     this.svgobj = paper.path(path)
 
-    // console.log(this.svgPath(this.polyline.points));
-    if (options.cl !== undefined) this.svgobj.addClass(options.cl)
-    if (options.grp !== undefined) options.grp.add(this.svgobj)
-
     // mouse events
     this.svgobj.data('sender', this);
   }
 }
 Object.defineProperties(GHSvg_Polyline.prototype, {
-  'svg': {
-    get: function() { return this.svgobj },
-    set: function(val) { return this.svgobj = val },
-  },
   'refresh': {
     value: function() {
       var path = this.svgPath(this.polyline.points)
@@ -132,13 +129,21 @@ Object.defineProperties(GHSvg_Polyline.prototype, {
   },
   'svgPath': {
     value: function(points) {
-      console.log("SVGVSGVSGVSGV");
-      var n = points.length
+      var pt
       var svg = ""
-      svg += "M" + points[0].x + " " +  points[0].y
-        for (var i = 1; i < n; i++) {
-          svg += " L" + points[i].x + " " +  points[i].y
-        }
+
+      pt = proj.transformVector(points[0])
+      svg += "M" + pt.x + " " +  pt.y
+      for (var i = 1; i < points.length; i++) {
+        pt = proj.transformVector(points[i])
+        svg += " L" + pt.x + " " +  pt.y
+      }
+
+      // svg += "M" + points[0].x + " " +  points[0].y
+      // for (var i = 1; i < points.length; i++) {
+      //   svg += " L" + points[i].x + " " +  points[i].y
+      // }
+
       return svg
     }
   }

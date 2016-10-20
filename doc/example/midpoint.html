@@ -13,49 +13,37 @@
 <body>
   <script>
 
+    // Set Up the grasshopper3d.js parametric model
+    var p1 = new GHPoint('P1', -300,0,0)
+    var p4 = new GHPoint('P4', 200,0,0)
+    var comp1 = new GHComp_Pts_Mid('P2',p1,p4)
+    var comp2 = new GHComp_Pts_Mid('P3',comp1.midpoint,p4)
+    var comp3 = new GHComp_Polyline('Polyline', [p1,comp1.midpoint,comp2.midpoint, p4])
+
+    // Set Up the SVG Viewport
     var width = 1080;
     var height = 720;
     var paper = Snap(width,height);
-
     var g = paper.g();
     g.attr({id:"cartesian"});
     g.attr({transform:"translate("+width/2+","+height/2+") scale(1,-1)"});
     var box = paper.rect(-width/2, -height/2, width, height).attr({strokeWidth:"1px", stroke:"black", fill:"none"})
     g.add(box)
 
-    var p1 = new GHPoint('P1', -300,0,0)
-    var p4 = new GHPoint('P4', 200,0,0)
-    var comp1 = new GHComp_Pts_Mid('P2',p1,p4)
-    var comp2 = new GHComp_Pts_Mid('P3',comp1.midpoint,p4)
-    
-    var comp3 = new GHComp_Polyline('Polyline', [p1,comp1.midpoint,comp2.midpoint, p4])
+    var proj = Matrix.identity()
 
 
-    var polyline = new GHSvg_Polyline(paper, 'SVG Polyline',comp3.polyline, {grp:g, r:5, cl:"line"})
-    var p1_svg = new GHSvg_Point(paper, 'SVG P1',p1, {grp:g, r:20, cl:"node"})
-    var p2_svg = new GHSvg_Point(paper, 'SVG P2',comp1.midpoint, {grp:g, r:10, cl:"node"})
-    var p3_svg = new GHSvg_Point(paper, 'SVG P3',comp2.midpoint, {grp:g, r:5, cl:"node"})
-    var p4_svg = new GHSvg_Point(paper, 'SVG P4',p4, {grp:g, r:20, cl:"node"})
+    // Set up the svg elements attached to the parametric model
+    var polyline = new GHSvg_Polyline(paper, 'SVG Polyline',comp3.polyline).toGroup(g).addClass("line")
+    var p1_svg = new GHSvg_Point(paper, 'SVG P1',p1, 20).toGroup(g).addClass("node")
+    var p2_svg = new GHSvg_Point(paper, 'SVG P2',comp1.midpoint, 20).toGroup(g).addClass("node")
+    var p3_svg = new GHSvg_Point(paper, 'SVG P3',comp2.midpoint, 5).toGroup(g).addClass("node")
+    var p4_svg = new GHSvg_Point(paper, 'SVG P4',p4, 20).toGroup(g).addClass("node")
 
+    var p0_svg = new GHSvg_Point(paper, 'SVG P0',p1, 50).toGroup(g).addClass("node").attr({id:"bob"})
 
-    //
-    // p4.x -= 100
-    // p4.x -= 100
-    // p4.x -= 100
-
-
-    // console.log("=======");
-    // p1.print()
-    // comp1.midpoint.print()
-    // comp2.midpoint.print()
-    // p2.print()
-    //
-    // // p1.x = 0
-    // console.log("=======");
-    // p1.print()
-    // comp1.midpoint.print()
-    // comp2.midpoint.print()
-    // p2.print()
+    // p0_svg.svgobj.attr({cx:50, r:100})
+    p0_svg
 
   </script>
 </body>

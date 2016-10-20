@@ -2,6 +2,15 @@
 
 This library written in javascript makes easier the production of geometric drawings to explain scientific concepts. It is deeply inspired from [grasshopper3d](http://www.grasshopper3d.com) and offers the same ability to construct parametric geometric models.
 
+### ToDo
+
+- [ ] implement a global viewport projection matrix (3D => 2D)
+- [ ] implement a GHSolution = {GHParma + GHComp} with global ids
+- [ ] implement a GHViewport = {GHSvg}
+- [ ] implement : circle and arc GHParam
+- [ ] implement : bezier curve GHParam
+- [ ] investigate arrowhead and <def> usage
+
 ## Main functionalities
 
   * `parametric modeling` : your drawings are adaptable, ready to be printed in various configurations, and ready to be animated in the browser
