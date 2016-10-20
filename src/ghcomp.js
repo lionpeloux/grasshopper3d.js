@@ -110,14 +110,12 @@ class GHComp_Polyline extends GHComp {
     super(id, "Polyline from Points")
 
     // register input parameters
-    for (var i = 0; i < points.length; i++) {
-      this.register_in(points[i])
-    }
+    for (var i = 0; i < points.length; i++) { this.register_in(points[i]) }
 
     // register output parameters
     var points_tmp = []
     for (var i = 0; i < points.length; i++) { points_tmp.push(new Vector(0,0,0))}
-    this.polyline = this.register_out(new GHPolyline('id', points_tmp))
+    this._polyline = this.register_out(new GHPolyline('id', points_tmp))
 
     // trigger computation
     this.refresh()
@@ -125,12 +123,15 @@ class GHComp_Polyline extends GHComp {
 }
 Object.defineProperties(GHComp_Polyline.prototype, {
   'polyline': {
-    get: function() { return this.polyline },
+    get: function() { return this._polyline },
   },
   'refresh': {
     value: function() {
-      for (var i = 0; i < this.register_in.length; i++) {
-        var pt = this.register_in[i].getData()
+      for (var i = 0; i < this.param_in.length; i++) {
+        var pt = this.param_in[i].getData()
+        this._polyline.points[i].x = pt.x
+        this._polyline.points[i].y = pt.y
+        this._polyline.points[i].z = pt.z
       }
       // this.pmid._setData((this.p1.x + this.p2.x)/2, (this.p1.y + this.p2.y)/2, (this.p1.z + this.p2.z)/2)
     },

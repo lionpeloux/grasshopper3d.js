@@ -23,7 +23,10 @@
 }
 
 .line{
-    stroke:blue;
+    fill: none;
+    stroke: black;
+    stroke-width: 2;
+    stroke-opacity: .6;
 }
 
 .shadow {

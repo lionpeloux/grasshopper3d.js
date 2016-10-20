@@ -24,22 +24,24 @@
     g.add(box)
 
     var p1 = new GHPoint('P1', -300,0,0)
-    var p1_svg = new GHSvg_Point(paper, 'SVG P1',p1, {grp:g, r:20, cl:"node"})
-
     var p4 = new GHPoint('P4', 200,0,0)
+    var comp1 = new GHComp_Pts_Mid('P2',p1,p4)
+    var comp2 = new GHComp_Pts_Mid('P3',comp1.midpoint,p4)
+    
+    var comp3 = new GHComp_Polyline('Polyline', [p1,comp1.midpoint,comp2.midpoint, p4])
+
+
+    var polyline = new GHSvg_Polyline(paper, 'SVG Polyline',comp3.polyline, {grp:g, r:5, cl:"line"})
+    var p1_svg = new GHSvg_Point(paper, 'SVG P1',p1, {grp:g, r:20, cl:"node"})
+    var p2_svg = new GHSvg_Point(paper, 'SVG P2',comp1.midpoint, {grp:g, r:10, cl:"node"})
+    var p3_svg = new GHSvg_Point(paper, 'SVG P3',comp2.midpoint, {grp:g, r:5, cl:"node"})
     var p4_svg = new GHSvg_Point(paper, 'SVG P4',p4, {grp:g, r:20, cl:"node"})
 
-    var comp1 = new GHComp_Pts_Mid('P2',p1,p4)
-    var p2_svg = new GHSvg_Point(paper, 'SVG P2',comp1.midpoint, {grp:g, r:10, cl:"node"})
 
-    var comp2 = new GHComp_Pts_Mid('P3',comp1.midpoint,p4)
-    var p3_svg = new GHSvg_Point(paper, 'SVG P3',comp2.midpoint, {grp:g, r:5, cl:"node"})
-
-    // var comp3 = new GHComp_Polyline('Polyline', [p1,comp1.midpoint,comp2.midpoint, p2])
-
-    p4.x -= 100
-    p4.x -= 100
-    p4.x -= 100
+    //
+    // p4.x -= 100
+    // p4.x -= 100
+    // p4.x -= 100
 
 
     // console.log("=======");

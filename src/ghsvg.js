@@ -7,15 +7,26 @@
 // Generic SVG (base class)
 class GHSvg {
   constructor(snap, id, name, param){
-    this.id = id            // unique id = 0, ..., N
-    this.name = name        // component name
-    this.snap = snap        // reference to snap object
-    this.isupdated = true   // false if the value is waiting to be computed
-    this.param = param      // register binded parameter
-    this.svgobj = undefined // a snapsvg element
+    this.id = id              // unique id = 0, ..., N
+    this.name = name          // component name
+    this.snap = snap          // reference to snap object
+    this.isupdated = true     // false if the value is waiting to be computed
+    this.svgobj = undefined   // a snapsvg element
+    this.param = this.register_param(param)
   }
 }
 Object.defineProperties(GHSvg.prototype, {
+  'register_param': {           // register the binded parameter
+    configurable: false,
+    value: function(param) {
+      param.register_svg(this)
+      return param
+    }
+  },
+  'attr': {           // register the binded parameter
+    configurable: true,
+    value: function(options) {}
+  },
   'refresh': {
     configurable: true,
     value: function() {} // to be overrided in components
@@ -39,8 +50,9 @@ Object.defineProperties(GHSvg.prototype, {
 class GHSvg_Point extends GHSvg {
   constructor(snap, id, point, options){
     super(snap, id, "SVGPoint", point)
-    this.point = point
-    point.comp_out.push(this)
+
+    // create an alias
+    this.point = this.param
 
     // deal with options
     var r = 10
@@ -86,3 +98,48 @@ var dragMove = function(dx, dy, x, y, e) {
         sender.point.setData(this.data('ox') + tdx, this.data('oy') + tdy, 0)
 }
 var dragEnd = function() {}
+
+// Add a SVG Polyline to a GHPolyline
+class GHSvg_Polyline extends GHSvg {
+  constructor(snap, id, polyline, options){
+    super(snap, id, "SVGPolyline", polyline)
+
+    // create an alias
+    this.polyline = this.param
+
+    // deal with options
+    var path = this.svgPath(this.polyline.points)
+    this.svgobj = paper.path(path)
+
+    // console.log(this.svgPath(this.polyline.points));
+    if (options.cl !== undefined) this.svgobj.addClass(options.cl)
+    if (options.grp !== undefined) options.grp.add(this.svgobj)
+
+    // mouse events
+    this.svgobj.data('sender', this);
+  }
+}
+Object.defineProperties(GHSvg_Polyline.prototype, {
+  'svg': {
+    get: function() { return this.svgobj },
+    set: function(val) { return this.svgobj = val },
+  },
+  'refresh': {
+    value: function() {
+      var path = this.svgPath(this.polyline.points)
+      this.svgobj.attr({d:path})
+    },
+  },
+  'svgPath': {
+    value: function(points) {
+      console.log("SVGVSGVSGVSGV");
+      var n = points.length
+      var svg = ""
+      svg += "M" + points[0].x + " " +  points[0].y
+        for (var i = 1; i < n; i++) {
+          svg += " L" + points[i].x + " " +  points[i].y
+        }
+      return svg
+    }
+  }
+})

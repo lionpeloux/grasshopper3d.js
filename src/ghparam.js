@@ -175,7 +175,8 @@ Object.defineProperties(GHPolyline.prototype, {
     value: function() {
       console.log("Polyline[" + this.count + "]")
       for (var i = 0; i < this.points.length; i++) {
-        console.log("Point[" + i + "] : (" + this.point.x + ", " + this.point.y + ", " + this.point.z + ")")
+        var point = this.points[i]
+        console.log("Point[" + i + "] : (" + point.x + ", " + point.y + ", " + point.z + ")")
       }
     }
   }
