@@ -4,56 +4,6 @@
 // parameters are objects that store datas
 // components are objects that acte on datas
 
-// Generic SVG (base class)
-class GHSvg {
-  constructor(snap, id, name, param){
-    this.id = id              // unique id = 0, ..., N
-    this.name = name          // component name
-    this.snap = snap          // reference to snap object
-    this.isupdated = true     // false if the value is waiting to be computed
-    this.svgobj = undefined   // a snapsvg element
-    this.param = this.register_param(param)
-  }
-}
-Object.defineProperties(GHSvg.prototype, {
-  'register_param': {           // register the binded parameter
-    value: function(param) {
-      param.register_svg(this)
-      return param
-    }
-  },
-  'attr': {
-    value: function(options) {this.svgobj.attr(options); console.log("atttrr");console.log(options);return this}
-  },
-  'addClass': {
-    value: function(str) {this.svgobj.addClass(str); return this}
-  },
-  'toGroup': {
-    value: function(grp) { grp.add(this.svgobj); return this}
-  },
-  'svg': {
-    get: function() { return this.svgobj },
-    set: function(val) { return this.svgobj = val },
-  },
-  'refresh': {
-    configurable: true,
-    value: function() {} // to be overrided in components
-  },
-  'spreadRefresh': {
-    value: function() {
-      this.refresh()
-      this.isupdated = true
-      console.log("Svg[" + this.id + "] : isupdated = " + this.isupdated)
-    }
-  },
-  'spreadStatut': {
-    value: function() {
-      this.isupdated = false
-      console.log("Svg[" + this.id + "] : isupdated = " + this.isupdated)
-    }
-  }
-})
-
 // Add a SVG Circle to a GHPoint
 class GHSvg_Point extends GHSvg {
   constructor(snap, id, point, r=20){
