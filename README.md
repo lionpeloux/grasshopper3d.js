@@ -43,6 +43,8 @@ The api doc is published through github-pages. Follow instructions [here](http:/
 
 ## Resources
 
+* [Observer Pattern](https://addyosmani.com/resources/essentialjsdesignpatterns/book/#observerpatternjavascript) : a useful guide that explains the main pattern used in `grasshopper3d.js`.
+* [Observer Pattern](http://robdodson.me/javascript-design-patterns-observer/) : help on binding context for events.
 
 ## Tutorials
 

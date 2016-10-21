@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/snap.svg/0.4.1/snap.svg.js"></script>
+    <script type="text/javascript" src="../../lib/matrix.js"></script>
+    <script type="text/javascript" src="../../lib/vector.js"></script>
+    <script type="text/javascript" src="../../lib/plane.js"></script>
+    <script type="text/javascript" src="../../src/interpolation.js"></script>
+    <script type="text/javascript" src="../../src/base.js"></script>
+    <script type="text/javascript" src="../../src/ghparam.js"></script>
+    <script type="text/javascript" src="../../src/ghcomp.js"></script>
+    <script type="text/javascript" src="../../src/ghsvg.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../css/tutorials.css">
+</head>
+<body>
+  <script>
+    // TEST PUBLISH/SUSCRIBE Pattern
+    // in a many-to-many relation ships, allows for passing custom variables such
+    // as the index of the publisher in the observer publisher's listing
+
+    class Publisher {
+      constructor(name){
+        this.name = name            // unique id = 0, ..., N
+        this.notifications = []
+        console.log('Publisher '+ this.name + ' created');
+      }
+    }
+    Object.defineProperties(Publisher.prototype, {
+      'suscribe': { // register suscriber
+        value: function(func) {
+          this.notifications.push(func)
+        }
+      },
+      'notify': { // fire all notifications
+        value: function(val) {
+          console.log("notify");
+          for (var i = 0; i < this.notifications.length; i++) {
+            this.notifications[i]()
+          }
+        }
+      },
+    })
+
+
+    class Observer {
+      constructor(name, p){
+        this.name = name
+        this.publishers = p // holds an ordered list to the observed publishers
+
+        console.log('Observer '+ this.name + ' created');
+
+        for (var i = 0; i < this.publishers.length; i++) {
+          console.log(this.publishers[i].name);
+        }
+        console.log(this.logNotificationBind)
+        for (var i = 0; i < this.publishers.length; i++) {
+          this.publishers[i].suscribe(this.logNotificationBind.bind(this, i))
+        }
+        console.log('Observer '+ this.name + ' observes ' + this.publishers.length + ' publishers');
+      }
+    }
+    Object.defineProperties(Observer.prototype, {
+      'logNotificationBind': { // register suscriber
+        value: function(index) {
+            console.log('Observer[' + this.name + '] : publisher['+ this.publishers[index].name +'] at ' + index + ' has notified me')
+          }
+      },
+    })
+
+    var pa = new Publisher("A")
+    var pb = new Publisher("B")
+    var pc = new Publisher("C")
+
+    var o1 = new Observer("1", [pa,pb,pc])
+    var o2 = new Observer("2", [pc,pa])
+
+
+    // console.log(pb);
+    pc.notify()
+    pb.notify()
+    pa.notify()
+    // Numb
+
+  </script>
+</body>
+</html>
