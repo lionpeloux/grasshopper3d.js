@@ -5,9 +5,15 @@
 // components are objects that acte on datas
 
 // global variables to trace refresh
-var debug_register  = true
-var debug_statut    = true
-var debug_refresh   = true
+var debug         = true
+var log_register  = true
+var log_statut    = true
+var log_refresh   = true
+var display_decimal = 3
+
+// =============================================================================
+//  BASE CLASSES
+// =============================================================================
 
 // Generic Parameter (base class)
 /**
@@ -41,7 +47,22 @@ Object.defineProperties(GHParam.prototype, {
     }
   },
   'hasChanged': { // raise "hasChanged" event => compute new statuts and recompute solution
-    value: function() {console.log("==== STATUT ==== "); this.spreadStatut(); console.log("==== REFERSH ==== "); this.spreadRefresh()}
+    value: function() {
+      if (log_statut || log_refresh) {
+        console.log("===============================")
+        console.log("  RECOMPUTE SOLUTION           ")
+        console.log("")
+      }
+      if (log_statut) {
+        console.log("*** broadcast statut ***")
+      }
+      this.spreadStatut();
+      if (log_refresh) {
+        console.log("")
+        console.log("*** broadcast refresh ***")
+
+      }
+      this.spreadRefresh()}
   },
   'refresh': {
     value: function() {}
@@ -50,8 +71,7 @@ Object.defineProperties(GHParam.prototype, {
     value: function() {
       this.refresh()
       this.isupdated = true
-      console.log('Param[' + this.id + '] : isupdated = ' + this.isupdated)
-      this.print()
+      if (log_refresh) { console.log("Param[" + this.type + '-' + this.id + "] : isupdated = " + this.isupdated) }
       for (var i = 0; i < this.comp_out.length; i++) {
         this.comp_out[i].spreadRefresh()
       }
@@ -63,7 +83,7 @@ Object.defineProperties(GHParam.prototype, {
   'spreadStatut': {
     value: function() {
       this.isupdated = false
-      console.log('Param[' + this.id + '] : isupdated = ' + this.isupdated)
+      if (log_statut) { console.log("Param[" + this.type + '-' + this.id + "] : isupdated = " + this.isupdated) }
       for (var i = 0; i < this.comp_out.length; i++) {
         this.comp_out[i].spreadStatut()
       }
@@ -108,7 +128,7 @@ Object.defineProperties(GHComp.prototype, {
   },
   'refresh': {
     configurable: true,
-    value: function() {return ""} // to be overrided in components
+    value: function() {} // to be overrided in components
   },
   'spreadRefresh': {
     configurable: false,
@@ -116,7 +136,7 @@ Object.defineProperties(GHComp.prototype, {
 
       // wait till all input parameters have been refreshed
       for (var i = 0; i < this.param_in.length; i++) {
-        if (this.param_in[i].isupdated == false) { console.log("------ NON "); return}
+        if (this.param_in[i].isupdated == false) { return }
       }
 
       // refresh should not be propagated more than once
@@ -125,7 +145,7 @@ Object.defineProperties(GHComp.prototype, {
       // otherwise, the component is ready to be refreshed
       this.refresh()
       this.isupdated = true
-      console.log("Comp[" + this.id + "] : isupdated = " + this.isupdated)
+      if (log_refresh) { console.log("Comp[" + this.id + "] : isupdated = " + this.isupdated) }
       for (var i = 0; i < this.param_out.length; i++) {
         this.param_out[i].spreadRefresh()
       }
@@ -139,7 +159,7 @@ Object.defineProperties(GHComp.prototype, {
 
       // otherwise, the component is hit by a statut switch and must propagate the spreadStatut process
       this.isupdated = false
-      console.log("Comp[" + this.id + "] : isupdated = " + this.isupdated)
+      if (log_statut) { console.log("Comp[" + this.id + "] : isupdated = " + this.isupdated) }
       for (var i = 0; i < this.param_out.length; i++) {
         this.param_out[i].spreadStatut()
       }
@@ -149,53 +169,121 @@ Object.defineProperties(GHComp.prototype, {
 
 // Generic SVG (base class)
 class GHSvg {
-  constructor(snap, id, name, param){
+  constructor(paper, viewport, id, name){
     this.id = id              // unique id = 0, ..., N
     this.name = name          // component name
-    this.snap = snap          // reference to snap object
+    this.paper = paper          // reference to snap object
     this.isupdated = true     // false if the value is waiting to be computed
-    this.svgobj = undefined   // a snapsvg element
-    this.param = this.register_param(param)
+    this.viewport = viewport  // global transformation matrix to apply for drawing 3D to 2D
+    this.param_in = []        // register all input parameters
+    this.svgobj = []          // a coolection of snapsvg elements
+
+    this.grp = undefined    // if several svgobj they should be grouped ?
+    // put generic logic here for drag&drop
+    // and animation callbacks on load
   }
 }
 Object.defineProperties(GHSvg.prototype, {
-  'register_param': {           // register the binded parameter
+  'register_in': { // resgister an input parameter and bind it to the component
+    configurable: false,
     value: function(param) {
+      this.param_in.push(param)
       param.register_svg(this)
       return param
     }
   },
-  'attr': {
-    value: function(options) {this.svgobj.attr(options); console.log("atttrr");console.log(options);return this}
-  },
-  'addClass': {
-    value: function(str) {this.svgobj.addClass(str); return this}
-  },
-  'toGroup': {
-    value: function(grp) { grp.add(this.svgobj); return this}
-  },
-  'svg': {
-    get: function() { return this.svgobj },
-    set: function(val) { return this.svgobj = val },
+  'register_svg': { // resgister a snap cvg element
+    configurable: false,
+    value: function(svg) {
+      this.svgobj.push(svg)
+      return svg
+    }
   },
   'refresh': {
     configurable: true,
     value: function() {} // to be overrided in components
   },
   'spreadRefresh': {
+    configurable: false,
     value: function() {
+
+      // wait till all input parameters have been refreshed
+      for (var i = 0; i < this.param_in.length; i++) {
+        if (this.param_in[i].isupdated == false) { return}
+      }
+
+      // refresh should not be propagated more than once
+      if (this.isupdated == true) { return }
+
+      // otherwise, the component is ready to be refreshed
       this.refresh()
       this.isupdated = true
-      console.log("Svg[" + this.id + "] : isupdated = " + this.isupdated)
+      if (log_refresh) { console.log("Svg[" + this.id + "] : isupdated = " + this.isupdated) }
     }
   },
   'spreadStatut': {
+    configurable: false,
     value: function() {
+      // statut should not be propagated more than once
+      if (this.isupdated == false) { return }
+
+      // otherwise, the component is hit by a statut switch and must propagate the spreadStatut process
       this.isupdated = false
-      console.log("Svg[" + this.id + "] : isupdated = " + this.isupdated)
+      if (log_statut) { console.log("Svg[" + this.id + "] : isupdated = " + this.isupdated) }
     }
-  }
+  },
+  'group': {  // group all svgobj
+    value: function(options) {
+      if (this.grp === undefined) {this.grp = this.paper.group()}
+      for (var i = 0; i < this.svgobj.length; i++) {
+        this.grp.add(this.svgobj[i])
+      }
+      return this
+    }
+  },
+  'attr': {
+    value: function(options) {
+      for (var i = 0; i < this.svgobj.length; i++) {
+        this.svgobj[i].attr(options)
+      }
+      return this
+    }
+  },
+  'addClass': {
+    value: function(str) {
+      if (this.grp === undefined) { // add attr to all elements
+        for (var i = 0; i < this.svgobj.length; i++) {
+          this.svgobj[i].addClass(str)
+        }
+      }
+      else { // a group exists, add it to the grp
+        this.grp.addClass(str)
+      }
+      return this
+    }
+  },
+  'toGroup': {
+    value: function(grp) {
+      if (this.grp === undefined) { // add all elements to grp
+        for (var i = 0; i < this.svgobj.length; i++) {
+          grp.add(this.svgobj[i])
+        }
+      }
+      else { // a group exists, add it to the grp
+        grp.add(this.grp)
+      }
+      return this
+    }
+  },
+  'svg': {
+    get: function() { return this.svgobj },
+    set: function(val) { return this.svgobj = val },
+  },
 })
+
+// =============================================================================
+//  SOLUTION
+// =============================================================================
 
 // Solution class
 /**
@@ -215,57 +303,101 @@ class GHSolution {
 }
 // GHParameters Methodes
 Object.defineProperties(GHSolution.prototype, {
-  'Point': { // register an output parameter no needs to bind
-    value: function(x, y, z) {
-      var param = new GHPoint(this.param_root.length, x, y, z)
+  'RegisterRootParam': {
+    value: function(param) {
       this.param_root.push(param)
+    }
+  },
+  'Number': {
+    value: function(num) {
+      var param = new GHNumber(this.param_root.length, num)
+      this.RegisterRootParam(param)
       return param
     }
   },
-  'register_svg': { // register an svg parameter no needs to bind
-    configurable: false,
-    value: function(svg) {
-      this.svg_out.push(svg)
-      return svg
+  'Point': {
+    value: function(x, y, z) {
+      var param = new GHPoint(this.param_root.length, x, y, z)
+      this.RegisterRootParam(param)
+      return param
     }
   },
-  'hasChanged': { // raise "hasChanged" event => compute new statuts and recompute solution
-    value: function() {console.log("==== STATUT ==== "); this.spreadStatut(); console.log("==== REFERSH ==== "); this.spreadRefresh()}
-  },
-  'refresh': {
-    value: function() {}
-  },
-  'spreadRefresh': {
-    value: function() {
-      this.refresh()
-      this.isupdated = true
-      console.log('Param[' + this.id + '] : isupdated = ' + this.isupdated)
-      this.print()
-      for (var i = 0; i < this.comp_out.length; i++) {
-        this.comp_out[i].spreadRefresh()
-      }
-      for (var i = 0; i < this.svg_out.length; i++) {
-        this.svg_out[i].spreadRefresh()
-      }
+  'Vector': {
+    value: function(x, y, z) {
+      var param = new GHVector(this.param_root.length, x, y, z)
+      this.RegisterRootParam(param)
+      return param
     }
   },
-  'spreadStatut': {
-    value: function() {
-      this.isupdated = false
-      console.log('Param[' + this.id + '] : isupdated = ' + this.isupdated)
-      for (var i = 0; i < this.comp_out.length; i++) {
-        this.comp_out[i].spreadStatut()
-      }
-      for (var i = 0; i < this.svg_out.length; i++) {
-        this.svg_out[i].spreadStatut()
-      }
+  'Plane': {
+    value: function(origin, xaxis, yaxis) {
+      var param = new GHPlane(this.param_root.length, origin, xaxis, yaxis)
+      this.RegisterRootParam(param)
+      return param
     }
-  }
+  },
+  'Circle': {
+    value: function(plane, r) {
+      var param = new GHCircle(this.param_root.length, plane, r)
+      this.RegisterRootParam(param)
+      return param
+    }
+  },
+  // 'Arc': {
+  //   value: function(plane, r) {
+  //     var param = new GHPlane(this.param_root.length, plane, r)
+  //     this.param_root.push(param)
+  //     return param
+  //   }
+  // },
+  'Polyline': {
+    value: function(points) {
+      var param = new GHPolyline(this.param_root.length, points)
+      this.RegisterRootParam(param)
+      return param
+    }
+  },
 })
 // GHComponents Methodes
 Object.defineProperties(GHSolution.prototype, {
-
+  'RegisterComp': {
+    value: function(comp) {
+      // register comp newly created param_out parameters
+      for (var i = 0; i < comp.param_out.length; i++) {
+        var param = comp.param_out[i]
+        param.id = this.param_comp.length
+        this.param_comp.push(param)
+      }
+      // register comp
+      this.comp.push(comp)
+    }
+  },
+  'MidPoint': {
+    value: function(p1, p2) {
+      var comp = new GHComp_Pts_Mid(this.comp.length, p1, p2)
+      this.RegisterComp(comp)
+      return comp
+    }
+  },
+  'Circle3pts': {
+    value: function(ps, pc, pe) {
+      var comp = new GHComp_Circle_3pts(this.comp.length, ps, pc, pe)
+      this.RegisterComp(comp)
+      return comp
+    }
+  },
+  'PolylineFromPts': {
+    value: function(pts) {
+      var comp = new GHComp_Polyline(this.comp.length, pts)
+      this.RegisterComp(comp)
+      return comp
+    }
+  },
 })
+
+// =============================================================================
+//  RENDER
+// =============================================================================
 
 // Render class
 /**
@@ -275,10 +407,47 @@ Object.defineProperties(GHSolution.prototype, {
  * @param {string} author - The author of the book.
  */
 class GHRender {
-  constructor(){
-    this.mproj  =  Matrix.identity()  // global transformation matrix to apply for drawing 3D to 2D
-    this.ghsvg  = []                  // register all ghsvg instances in the current render
+  constructor(width=710, height=400){
+    this.viewport   =  Matrix.identity()  // global transformation matrix to apply for drawing 3D to 2D
+    this.comp_svg = []                   // register all ghsvg instances in the current render
+    this.isupdated  = true                // false if the render needs to be redrawn
 
-    this.isupdated = true   // false if the render needs to be redrawn
+    // create cartesian centered snap paper with a border
+    this.width      = width
+    this.height     = height
+    this.paper      = Snap(this.width,this.height);
+    this.mastergrp  = this.paper.g()
+                                .attr({id:"cartesian"})
+                                .attr({transform:"translate("+this.width/2+","+this.height/2+") scale(1,-1)"})
+    this.borderbox  = this.paper.rect(-this.width/2, -this.height/2, this.width, this.height)
+                           .attr({strokeWidth:"1px", stroke:"black", fill:"none"})
+    this.mastergrp.add(this.borderbox)
+
+    // how to deal with groups ?
+    // how to deal with markers ?
+    // how to deal with defs ?
   }
 }
+// GHRender Methodes
+Object.defineProperties(GHRender.prototype, {
+  'RegisterSvg': {
+    value: function(ghsvg) {
+      this.comp_svg.push(ghsvg)
+    }
+  },
+  'Redraw': { // to be called after a change of viewport
+    value: function() {
+      for (var i = 0; i < this.comp_svg.length; i++) {
+        this.comp_svg[i].refresh()
+      }
+    }
+  },
+  'Point': {
+    value: function(ghpoint, r) {
+      var ghsvg = new GHSvg_Point(this.paper, this.viewport, this.comp_svg.length, ghpoint, r)
+      ghsvg.toGroup(this.mastergrp)
+      this.RegisterSvg(ghsvg)
+      return ghsvg
+    }
+  },
+})

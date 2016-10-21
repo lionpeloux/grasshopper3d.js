@@ -6,35 +6,35 @@
 
 // Number Parameter
 class GHNumber extends GHParam {
-  constructor(id, num) {
+  constructor(id, number) {
     super(id, 'Number')
-    this.num = num
+    this.number = number
   }
 }
 Object.defineProperties(GHNumber.prototype, {
   '_value': {
     set: function(val) {
-      this.num = val
+      this.number = val
     }
   },
   'value': {
-    get: function() { return this.num },
+    get: function() { return this.number },
     set: function(val) {
-      this.num = val
+      this._value = val
       this.hasChanged()
     }
   },
   'getData': {
-    value: function() { return this.num }
+    value: function() { return this.number }
   },
   'setData': {
-    value: function(num) { this.num = num; this.hasChanged()}
+    value: function(data) { this._setData(data); this.hasChanged() }
   },
   '_setData': {
-    value: function(num) { this.num = num; } // set data but does not raise hasChanged event
+    value: function(data) { this.number = data; } // set data but does not raise hasChanged event
   },
   'print': {
-    value: function() { console.log("Number[" + this.id + "] : " + this.num ) }
+    value: function() { console.log("Number[" + this.id + "] : " + Math.round10(this.number, -display_decimal)) }
   }
 })
 
@@ -54,7 +54,7 @@ Object.defineProperties(GHPoint.prototype, {
   'x': {
     get: function() { return this.point.x },
     set: function(val) {
-      this.point.x = val
+      this._x = val
       this.hasChanged()
     }
   },
@@ -66,7 +66,7 @@ Object.defineProperties(GHPoint.prototype, {
   'y': {
     get: function() { return this.point.y },
     set: function(val) {
-      this.point.y = val
+      this._y = val
       this.hasChanged()
     }
   },
@@ -78,7 +78,7 @@ Object.defineProperties(GHPoint.prototype, {
   'z': {
     get: function() { return this.point.z },
     set: function(val) {
-      this.point.z = val
+      this._z = val
       this.hasChanged()
     }
   },
@@ -86,13 +86,14 @@ Object.defineProperties(GHPoint.prototype, {
     value: function() { return this.point }
   },
   'setData': {
-    value: function(x,y,z) { this.point.x=x; this.point.y=y; this.point.z=z; this.hasChanged()}
+    value: function(x,y,z) { this._setData(x,y,z); this.hasChanged()}
   },
   '_setData': {
-    value: function(x,y,z) { this.point.x=x; this.point.y=y; this.point.z=z;} // set data but does not raise hasChanged event
+    value: function(x,y,z) { this.point._setData(x,y,z) } // set data but does not raise hasChanged event
   },
   'print': {
-    value: function() { console.log("Point[" + this.id + "] : (" + this.point.x + ", " + this.point.y + ", " + this.point.z + ")") }
+    value: function() {
+      console.log('Point[' + this.id + '] : ' + this.point.str()) }
   }
 })
 
@@ -112,7 +113,7 @@ Object.defineProperties(GHVector.prototype, {
   'x': {
     get: function() { return this.vector.x },
     set: function(val) {
-      this.vector.x = val
+      this._x = val
       this.hasChanged()
     }
   },
@@ -124,7 +125,7 @@ Object.defineProperties(GHVector.prototype, {
   'y': {
     get: function() { return this.vector.y },
     set: function(val) {
-      this.vector.y = val
+      this._y = val
       this.hasChanged()
     }
   },
@@ -136,7 +137,7 @@ Object.defineProperties(GHVector.prototype, {
   'z': {
     get: function() { return this.vector.z },
     set: function(val) {
-      this.vector.z = val
+      this._z = val
       this.hasChanged()
     }
   },
@@ -144,13 +145,14 @@ Object.defineProperties(GHVector.prototype, {
     value: function() { return this.vector }
   },
   'setData': {
-    value: function(x,y,z) { this.vector.x=x; this.vector.y=y; this.vector.z=z; this.hasChanged()}
+    value: function(x,y,z) { this._setData(x,y,z); this.hasChanged() }
   },
   '_setData': {
-    value: function(x,y,z) { this.vector.x=x; this.vector.y=y; this.vector.z=z;} // set data but does not raise hasChanged event
+    value: function(x,y,z) { this.vector._setData(x,y,z) } // set data but does not raise hasChanged event
   },
   'print': {
-    value: function() { console.log("Point[" + this.id + "] : (" + this.vector.x + ", " + this.vector.y + ", " + this.vector.z + ")") }
+    value: function() {
+      console.log('Vector[' + this.id + '] : ' + this.vector.str()) }
   }
 })
 
@@ -162,63 +164,42 @@ class GHPlane extends GHParam {
   }
 }
 Object.defineProperties(GHPlane.prototype, {
-  '_xaxis': {
-    set: function(val) {
-      this.plane.xaxis = val
+  '_origin': {
+    set: function(x,y,z) {
+      this.plane.origin._setData(x,y,z)
     }
   },
-  'xaxis': {
-    get: function() { return this.plane.xaxis },
-    set: function(val) {
-      this.plane.xaxis = val
+  'origin': {
+    get: function() { return this.plane.origin },
+    set: function(x,y,z) {
+      this._origin(x,y,z)
       this.hasChanged()
-    }
-  },
-  '_yaxis': {
-    set: function(val) {
-      this.plane.yaxis = val
     }
   },
   'yaxis': {
-    get: function() { return this.plane.yaxis },
-    set: function(val) {
-      this.plane.yaxis = val
-      this.hasChanged()
-    }
-  },
-  '_zaxis': {
-    set: function(val) {
-      this.plane.zaxis = val
-    }
+    get: function() { return this.plane.yaxis }
   },
   'zaxis': {
-    get: function() { return this.plane.zaxis },
-    set: function(val) {
-      this.plane.zaxis = val
-      this.hasChanged()
-    }
+    get: function() { return this.plane.zaxis }
   },
   'getData': {
     value: function() { return this.plane }
   },
   'setData': {
     value: function(origin, xaxis, yaxis) {
-      this.plane = new Plane(origin, xaxis, yaxis)
+      this._setData(origin, xaxis, yaxis) // enforce the validity of the new plane
       this.hasChanged()
     }
   },
   '_setData': {
-    value: function(x,y,z) {
-      this.plane = new Plane(origin, xaxis, yaxis)
+    value: function(origin, xaxis, yaxis) {
+      this.plane = new Plane(origin, xaxis, yaxis) // enforce the validity of the new plane
     } // set data but does not raise hasChanged event
   },
   'print': {
-    value: function() { console.log("Plane[" + this.id + "] : " +
-    "(O: " + this.plane.origin.x  + ", " + this.plane.origin.y  + ", " + this.plane.origin.z  + ")" +
-    "(X: " + this.plane.xaxis.x   + ", " + this.plane.xaxis.y   + ", " + this.plane.xaxis.z   + ")" +
-    "(Y: " + this.plane.yaxis.x   + ", " + this.plane.yaxis.y   + ", " + this.plane.yaxis.z   + ")" +
-    "(Z: " + this.plane.zaxis.x   + ", " + this.plane.zaxis.y   + ", " + this.plane.zaxis.z   + ")"
-    )}
+    value: function() {
+      console.log("Plane[" + this.id + "] : " + this.plane.str())
+    }
   }
 })
 
@@ -249,10 +230,7 @@ Object.defineProperties(GHPolyline.prototype, {
   },
   'setData': {
     value: function(points) {
-      this.points = []
-      for (var i = 0; i < points.length; i++) {
-        this.points.push(new Vector(points[i].x, points[i].y, points[i].z))
-      }
+      this._setData(points)
       this.hasChanged()
     }
   },
@@ -266,11 +244,13 @@ Object.defineProperties(GHPolyline.prototype, {
   },
   'print': {
     value: function() {
-      console.log("Polyline[" + this.count + "]")
+      var str = 'Polyline[' + this.count + '] : ['
       for (var i = 0; i < this.points.length; i++) {
         var point = this.points[i]
-        console.log("Point[" + i + "] : (" + point.x + ", " + point.y + ", " + point.z + ")")
+        str += this.points[i].str() + ', '
       }
+      str += ']'
+      console.log(str)
     }
   }
 })
@@ -279,12 +259,23 @@ Object.defineProperties(GHPolyline.prototype, {
 class GHCircle extends GHParam {
   constructor(id, plane, r) {
     super(id, 'Circle')
-    console.log(plane);
     this.pl = plane
     this.radius = r
   }
 }
 Object.defineProperties(GHCircle.prototype, {
+  '_origin': {
+    set: function(x,y,z) {
+      this.pl.origin._setData(x,y,z)
+    }
+  },
+  'origin': {
+    get: function() { return this.pl.origin },
+    set: function(x,y,z) {
+      this._origin(x,y,z)
+      this.hasChanged()
+    }
+  },
   '_plane': {
     set: function(val) {
       this.pl = val.clone()
@@ -293,47 +284,65 @@ Object.defineProperties(GHCircle.prototype, {
   'plane': {
     get: function() { return this.pl },
     set: function(val) {
-      this.pl = val.clone()
+      this._plane = val
       this.hasChanged()
     }
   },
   '_r': {
-    set: function(r) {
-      this.radius = r
+    set: function(val) {
+      this.radius = val
     }
   },
   'r': {
     get: function() { return this.radius },
     set: function(val) {
-      this.radius = val
+      this._r = val
       this.hasChanged()
     }
   },
   'getData': {
-    value: function() { return {plane:this.pl, r:this.r} }
+    value: function() { return {plane:this.plane, r:this.r} }
   },
   'setData': {
-    value: function(plane,r) { this.pl=plane.clone(); this.r=r; this.hasChanged()}
+    value: function(plane,r) { this._setData(plane,r); this.hasChanged()}
   },
   '_setData': {
-    value: function(plane,r) { this.pl=plane.clone(); this.r=r } // set data but does not raise hasChanged event
+    value: function(plane,r) { this._plane = plane; this._r = r } // set data but does not raise hasChanged event
   },
   'print': {
-    value: function() { console.log("Circle[" + this.id + "] : "+
-    "(O:" + this.pl.origin.x + ", " + this.pl.origin.y + ", " + this.pl.origin.z + ")" + " r = " + this.r) }
+    value: function() {
+      console.log(
+        "Circle[" + this.id + "] : "+
+        " O:" + this.pl.origin.str() + " & r: " + Math.round10(this.r,-display_decimal)
+      )
+    }
   }
 })
 
 // Arc Parameter
 class GHArc extends GHParam {
-  constructor(id, plane, r) {
-    super(id, 'Circle')
-    console.log(plane);
+  constructor(id, plane, r, a1, a2) {
+    super(id, 'Arc')
     this.pl = plane
     this.radius = r
+    this.angle_1 = a1  // oriented angle around zaxis from xaxis (pi>a1>0 )
+    this.angle_2 = a2  // oriented angle around zaxis from xaxis (-pi<a2<0)
+    // this definition aknowledge that the p = plane.origin + r * plane.xaxis is on the arc
   }
 }
 Object.defineProperties(GHArc.prototype, {
+  '_origin': {
+    set: function(x,y,z) {
+      this.pl.origin._setData(x,y,z)
+    }
+  },
+  'origin': {
+    get: function() { return this.pl.origin },
+    set: function(x,y,z) {
+      this._origin(x,y,z)
+      this.hasChanged()
+    }
+  },
   '_plane': {
     set: function(val) {
       this.pl = val.clone()
@@ -342,33 +351,67 @@ Object.defineProperties(GHArc.prototype, {
   'plane': {
     get: function() { return this.pl },
     set: function(val) {
-      this.pl = val.clone()
+      this._plane = val
       this.hasChanged()
     }
   },
   '_r': {
-    set: function(r) {
-      this.radius = r
+    set: function(val) {
+      this.radius = val
     }
   },
   'r': {
     get: function() { return this.radius },
     set: function(val) {
-      this.radius = val
+      this._r = val
+      this.hasChanged()
+    }
+  },
+  '_a1': {
+    set: function(val) {
+      this.angle_1 = val
+    }
+  },
+  'a1': {
+    get: function() { return this.angle_1 },
+    set: function(val) {
+      this._a1 = val
+      this.hasChanged()
+    }
+  },
+  '_a2': {
+    set: function(val) {
+      this.angle_2 = val
+    }
+  },
+  'a2': {
+    get: function() { return this.angle_2 },
+    set: function(val) {
+      this._a2 = val
       this.hasChanged()
     }
   },
   'getData': {
-    value: function() { return {plane:this.pl, r:this.r} }
+    value: function() { return { plane:this.plane, r:this.r, ai:this.a1, a2:this.a2 } }
   },
   'setData': {
-    value: function(plane,r) { this.pl=plane.clone(); this.r=r; this.hasChanged()}
+    value: function(plane,r, a1, a2) { this._setData(plane,r, a1, a2); this.hasChanged() }
   },
   '_setData': {
-    value: function(plane,r) { this.pl=plane.clone(); this.r=r } // set data but does not raise hasChanged event
+    value: function(plane,r, a1, a2) {
+      this._plane = plane
+      this._r=r
+      this._a1 = a1
+      this._a2 = a2
+    } // set data but does not raise hasChanged event
   },
   'print': {
-    value: function() { console.log("Circle[" + this.id + "] : "+
-    "(O:" + this.pl.origin.x + ", " + this.pl.origin.y + ", " + this.pl.origin.z + ")" + " r = " + this.r) }
+    value: function() {
+      console.log(
+        "Arc[" + this.id + "] : "+
+        " O:" + this.pl.origin.str() + " & r: " + Math.round10(this.r,-display_decimal) +
+        ' (' + Math.round10(this.a1*(180/3.1416),-1) + ', ' +  Math.round10(this.a2*(180/3.1416),-1) +')'
+      )
+    }
   }
 })

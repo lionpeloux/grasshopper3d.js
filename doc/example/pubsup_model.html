@@ -68,20 +68,49 @@
       },
     })
 
-    var pa = new Publisher("A")
-    var pb = new Publisher("B")
-    var pc = new Publisher("C")
-
-    var o1 = new Observer("1", [pa,pb,pc])
-    var o2 = new Observer("2", [pc,pa])
-
-
-    // console.log(pb);
-    pc.notify()
-    pb.notify()
-    pa.notify()
+    // var pa = new Publisher("A")
+    // var pb = new Publisher("B")
+    // var pc = new Publisher("C")
+    //
+    // var o1 = new Observer("1", [pa,pb,pc])
+    // var o2 = new Observer("2", [pc,pa])
+    //
+    //
+    // // console.log(pb);
+    // pc.notify()
+    // pb.notify()
+    // pa.notify()
     // Numb
 
   </script>
+<script>
+  var s = new GHSolution()
+  var p1 = s.Point(0,0,0)
+  var p2 = s.Point(9.98290309238908,0,0)
+  var p3 = s.Point(100,-10,0)
+  var n1 = s.Number(3.24)
+  var v1 = s.Vector(-1,-10,109)
+  // console.log(s);
+
+  var c1 = s.MidPoint(p1,p2)
+
+  // console.log(c1);
+  // console.log(c1.midpoint);
+
+  var c2 = s.Circle3pts(p1,c1.midpoint, p2)
+  // console.log(s);
+  //
+  // console.log('');
+  // console.log('');
+  // console.log('===========================');
+  var render = new GHRender()
+  // console.log(render);
+
+  var svgp1 = render.Point(p3, 30)
+  svgp1.addClass("node")
+
+  // p2.print()
+
+</script>
 </body>
 </html>

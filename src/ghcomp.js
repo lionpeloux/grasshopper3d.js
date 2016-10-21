@@ -36,12 +36,12 @@ class GHComp_Circle_3pts extends GHComp {
   constructor(id, p1, p2, p3){
     super(id, "Circle3pts")
 
-    // register input parameters
+    // register input gh parameters
     this.p1 = this.register_in(p1)
     this.p2 = this.register_in(p2)
     this.p2 = this.register_in(p3)
 
-    // register output parameters
+    // register output gh parameters
     var res = Circle3pts(p1.point,p2.point,p3.point) // [k, c, t, t1, t2]
     var r = 1/res.k
     var xaxis = p1.point.subtract(res.c)
@@ -60,7 +60,6 @@ Object.defineProperties(GHComp_Circle_3pts.prototype, {
   'refresh': {
     value: function() {
       var res = Circle3pts(p1.point,p2.point,p3.point) // [k, c, t, t1, t2]
-      console.log(res);
       var r = 1/res.k
       var xaxis = p1.point.subtract(res.c)
       var yaxis = res.kb.cross(xaxis)
@@ -69,7 +68,6 @@ Object.defineProperties(GHComp_Circle_3pts.prototype, {
     },
   },
 })
-
 
 // Polyline from several GHPoints
 class GHComp_Polyline extends GHComp {
@@ -100,7 +98,6 @@ Object.defineProperties(GHComp_Polyline.prototype, {
         this._polyline.points[i].y = pt.y
         this._polyline.points[i].z = pt.z
       }
-      // this.pmid._setData((this.p1.x + this.p2.x)/2, (this.p1.y + this.p2.y)/2, (this.p1.z + this.p2.z)/2)
     },
   },
 })

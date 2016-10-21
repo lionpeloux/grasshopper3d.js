@@ -31,24 +31,15 @@ function Circle3pts(start, center, end){
     var yaxis = kb.cross(xaxis)
     var plane = new Plane(c,xaxis,yaxis)
 
-
-
     var theta_1 = - Math.acos(t1.dot(t)) // oriented angle
     var theta_2 =   Math.acos(t2.dot(t)) // oriented angle
 
-console.log(" === ");
-    console.log(t1.length());
-    console.log(t.length());
     return {plane:plane, theta_1:theta_1, theta_2:theta_2, k:k, kb:kb, c:c, t:t, t1:t1, t2:t2}
 }
 
 function ArcToBezier(plane, r, theta_1, theta_2, angle_max = 1.0471975512){
   // http://pomax.github.io/bezierinfo/#circles_cubic
   // max angle of a single cubic bezier element
-
-  console.log(theta_1);
-  console.log(theta_2);
-
 
   var n1 = Math.floor(-theta_1/angle_max) + 1
   var phi_1 = -theta_1/n1 // < 0
