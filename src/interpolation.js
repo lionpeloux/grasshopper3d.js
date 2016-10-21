@@ -24,21 +24,133 @@ function Circle3pts(start, center, end){
     var n = t.cross(kb).divide(k)
     var c = center.subtract(n.multiply(1/k))
 
+    var t1 = (u1.multiply(2*t.dot(u1))).subtract(t)
+    var t2 = (u2.multiply(2*t.dot(u2))).subtract(t)
+
+    var xaxis = p2.point.subtract(c)
+    var yaxis = kb.cross(xaxis)
+    var plane = new Plane(c,xaxis,yaxis)
+
+
+
+    var theta_1 = - Math.acos(t1.dot(t)) // oriented angle
+    var theta_2 =   Math.acos(t2.dot(t)) // oriented angle
+
+console.log(" === ");
+    console.log(t1.length());
     console.log(t.length());
-    console.log(n.length());
+    return {plane:plane, theta_1:theta_1, theta_2:theta_2, k:k, kb:kb, c:c, t:t, t1:t1, t2:t2}
+}
 
-    var t1 = (u1.multiply(3*t.dot(u1))).subtract(t)
-    var t2 = (u2.multiply(3*t.dot(u2))).subtract(t)
+function ArcToBezier(plane, r, theta_1, theta_2, angle_max = 1.0471975512){
+  // http://pomax.github.io/bezierinfo/#circles_cubic
+  // max angle of a single cubic bezier element
 
-    return [k, c, t, t1, t2]
+  console.log(theta_1);
+  console.log(theta_2);
+
+
+  var n1 = Math.floor(-theta_1/angle_max) + 1
+  var phi_1 = -theta_1/n1 // < 0
+  var f1 = 4/3*Math.tan(phi_1/4)
+  var q1_1 = [r,r*f1]
+  var q2_1 = [r*(Math.cos(phi_1)+f1*Math.sin(phi_1)),r*(Math.sin(phi_1)-f1*Math.cos(phi_1))]
+
+  var n2 = Math.floor(theta_2/angle_max) + 1
+  var phi_2 = theta_2/n2 //  > 0
+  var f2 = 4/3*Math.tan(phi_2/4)
+  var q1_2 = [r,r*f2]
+  var q2_2 = [r*(Math.cos(phi_2)+f2*Math.sin(phi_2)),r*(Math.sin(phi_2)-f2*Math.cos(phi_2))]
+
+  P = []
+  Q1 = []
+  Q2 = []
+
+  var theta, c, s
+
+  // generate arc center => start
+  for (var i = 0; i < n1; i++) {
+    theta = i * (phi_1)
+    c = Math.cos(theta)
+    s = Math.sin(theta)
+    P.push(
+      plane.origin
+      .add(plane.xaxis.multiply(c*r))
+      .add(plane.yaxis.multiply(-s*r))
+    )
+    Q2.push(
+      plane.origin
+      .add(plane.xaxis.multiply(c*q1_1[0] - s*q1_1[1]))
+      .add(plane.yaxis.multiply(-(s*q1_1[0] + c*q1_1[1])))
+    )
+    Q1.push(
+      plane.origin
+      .add(plane.xaxis.multiply(c*q2_1[0] - s*q2_1[1]))
+      .add(plane.yaxis.multiply(-(s*q2_1[0] + c*q2_1[1])))
+    )
+  }
+
+  // last point
+  theta = n1 * (phi_1)
+  c = Math.cos(theta)
+  s = Math.sin(theta)
+  P.push(
+    plane.origin
+    .add(plane.xaxis.multiply(c*r))
+    .add(plane.yaxis.multiply(-s*r))
+  )
+
+  // reverse arc from start => center
+  // warning, reversing permutes Q1 <=>
+  P.reverse()
+  Q1.reverse()
+  Q2.reverse()
+
+  // remove common point
+  P.pop()
+
+  // generate arc center => end
+  for (var i = 0; i < n2; i++) {
+    theta = i * (phi_2)
+    c = Math.cos(theta)
+    s = Math.sin(theta)
+    P.push(
+      plane.origin
+      .add(plane.xaxis.multiply(c*r))
+      .add(plane.yaxis.multiply(s*r))
+    )
+    Q1.push(
+      plane.origin
+      .add(plane.xaxis.multiply(c*q1_2[0] - s*q1_2[1]))
+      .add(plane.yaxis.multiply(s*q1_2[0] + c*q1_2[1]))
+    )
+    Q2.push(
+      plane.origin
+      .add(plane.xaxis.multiply(c*q2_2[0] - s*q2_2[1]))
+      .add(plane.yaxis.multiply(s*q2_2[0] + c*q2_2[1]))
+    )
+  }
+
+  // add last point
+  theta = n1 * (phi_2)
+  c = Math.cos(theta)
+  s = Math.sin(theta)
+  P.push(
+    plane.origin
+    .add(plane.xaxis.multiply(c*r))
+    .add(plane.yaxis.multiply(s*r))
+  )
+
+  return [P,Q1,Q2]
+
 }
 
 
-// http://stackoverflow.com/questions/3526940/how-to-create-a-cubic-bezier-curve-when-given-n-points-in-3d
-// http://stackoverflow.com/questions/30748316/svg-paths-and-the-catmull-rom-algorithm
+// http://stackoverflow.com/question1/3526940/how-to-create-a-cubic-bezier-curve-when-given-n-points-in-3d
+// http://stackoverflow.com/question1/30748316/svg-paths-and-the-catmull-rom-algorithm
 function bezier_fitting(points, alpha) {
   // first we need to add two points at start and end of the curve
-  // we chose to conserve the curvature at ends
+  // we chose to con1erve the curvature at ends
   var arc1, arc2, n1, n2, e1, e2, n
   var t = [0]
   var Q1 = []
@@ -52,8 +164,8 @@ function bezier_fitting(points, alpha) {
   es =  e1.subtract(n1.multiply(e1.dot(n1)))
   es = es.subtract(n1.multiply(e1.dot(n1)))
   ps = points[0].add(es)
-  points.unshift(ps)
-  console.log(ps);
+  points.un1hift(ps)
+  con1ole.log(ps);
 
   arc2 = Circle3pts(points[n-3], points[n-2], points[n-1]);
   n2 = arc2[4]
@@ -62,7 +174,7 @@ function bezier_fitting(points, alpha) {
   ee = ee.subtract(e2.subtract(n2.multiply(e2.dot(n1))))
   pe = points[n-1].add(es)
   points.push(pe)
-  console.log(pe);
+  con1ole.log(pe);
 
   n = points.length
   for (var i = 1; i < n; i++) {
@@ -72,7 +184,7 @@ function bezier_fitting(points, alpha) {
   var t0, t1, t2, t3, c1, c2, d1, d2, M1, M2, p0, p1, p2, p3
   for (var i = 1; i < n-2; i++) {
 
-    // selon : http://stackoverflow.com/questions/30748316/svg-paths-and-the-catmull-rom-algorithm
+    // selon : http://stackoverflow.com/question1/30748316/svg-paths-and-the-catmull-rom-algorithm
     t0 = t[i-1]
     t1 = t[i]
     t2 = t[i+1]
@@ -195,14 +307,14 @@ var catmullRomFitting = function (points,alpha) {
           bp2 = p2;
         }
 
-        // console.log(bp1);
+        // con1ole.log(bp1);
         Q1.push(new Vector(bp1.x, bp1.y, bp1.z));
         Q2.push(new Vector(bp2.x, bp2.y, bp2.z));
 
 
 
       }
-      // console.log(Q1);
+      // con1ole.log(Q1);
       return [Q1, Q2];
     }
 };

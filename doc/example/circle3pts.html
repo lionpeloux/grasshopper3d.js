@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/snap.svg/0.4.1/snap.svg.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.0/TweenLite.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.0/TweenMax.min.js"></script>
+    <script type="text/javascript" src="../../lib/matrix.js"></script>
+    <script type="text/javascript" src="../../lib/vector.js"></script>
+    <script type="text/javascript" src="../../lib/plane.js"></script>
+    <script type="text/javascript" src="../../src/interpolation.js"></script>
+    <script type="text/javascript" src="../../src/ghparam.js"></script>
+    <script type="text/javascript" src="../../src/ghcomp.js"></script>
+    <script type="text/javascript" src="../../src/ghsvg.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../css/tutorials.css">
+</head>
+<body>
+  <script>
+
+    // Set Up the grasshopper3d.js parametric model
+    var a = 200
+    var angle = -90*3.14/180
+    var x = a*Math.cos(angle)
+    var y = a*Math.sin(angle)
+
+    // var p1 = new GHPoint('P1', 0,-a,0)
+    // var p2 = new GHPoint('P2', a,0,0)
+    // var p3 = new GHPoint('P3', 0,a,0)
+    var p1 = new GHPoint('P1', -a,0,0)
+    var p2 = new GHPoint('P2', 0,0,0)
+    var p3 = new GHPoint('P2', x,y,0)
+    var comp1 = new GHComp_Polyline('Polyline', [p1,p2,p3])
+    var comp2 = new GHComp_Circle_3pts('C2', p1,p2,p3)
+
+
+    // Set Up the SVG Viewport
+    var width = 1080;
+    var height = 720;
+    var paper = Snap(width,height);
+    var g = paper.g();
+    g.attr({id:"cartesian"});
+    g.attr({transform:"translate("+width/2+","+height/2+") scale(1,-1)"});
+    var box = paper.rect(-width/2, -height/2, width, height).attr({strokeWidth:"1px", stroke:"black", fill:"none"})
+    g.add(box)
+
+    var proj = Matrix.identity()
+
+    // Set up the svg elements attached to the parametric model
+    var p1_svg = new GHSvg_Point(paper, 'SVG P1',p1, 10).toGroup(g).addClass("node")
+    var p2_svg = new GHSvg_Point(paper, 'SVG P2',p2, 10).toGroup(g).addClass("node")
+    var p3_svg = new GHSvg_Point(paper, 'SVG P3',p3, 10).toGroup(g).addClass("node")
+
+
+    var polyline = new GHSvg_Polyline(paper, 'SVG Polyline',comp1.polyline).toGroup(g).addClass("line")
+
+    var pl = Plane.XY()
+    var c1 = new GHCircle('C1', pl, 200)
+    var c1_svg = new GHSvg_Circle(paper, 'SVG C1', c1).toGroup(g).addClass("line")
+    var c2_svg = new GHSvg_Circle(paper, 'SVG C2', comp2.circle).toGroup(g).addClass("line")
+
+
+
+
+
+    // var param = {val:1e-2}
+    //
+    // TweenMax.to(param, 2, {
+    //   val:(180-1e-2),
+    //   repeat: 3,
+    //   yoyo: true,
+    //   onUpdate:applyValue,
+    //   onUpdateParams:[param.val]
+    // })
+    //
+    //   function applyValue (val){
+    //       console.log(""); //always passes 100
+    //       console.log("------------------"); //always passes 100
+    //   	 console.log(param.val); //always passes 100
+    //      console.log("------------------"); //always passes 100
+    //
+    //      var angle = param.val*3.14/180
+    //      var x = a*Math.cos(angle)
+    //      var y = a*Math.sin(angle)
+    //      p3.setData(x,y,0)
+    // };
+
+
+    var res = Circle3pts(p1.point, p2.point, p3.point)
+    // return {plane:plane, ,theta_1:theta_1, theta_2:theta_2, k:k, kb:kb, c:c, t:t, t1:t1, t2:t2}
+    var res2 = ArcToBezier(res.plane, 1/res.k, res.theta_1, res.theta_2, 3.14/8)
+    var pp = InterpSVG(res2[0], res2[1], res2[2])
+    console.log(pp);
+    console.log(res2);
+
+    for (var i = 0; i < res2[1].length; i++) {
+      g.add(paper.circle(res2[0][i].x, res2[0][i].y, 5))
+      g.add(paper.circle(res2[1][i].x, res2[1][i].y, 2).addClass("node"))
+      g.add(paper.circle(res2[2][i].x, res2[2][i].y, 2).addClass("node"))
+    }
+    g.add(paper.circle(res2[0][res2[0].length-1].x, res2[0][i].y, 5))
+    g.add(paper.path(pp).addClass("line"))
+
+    // Snap.animate(0, 90, function (val) {
+    //
+    //   var angle = val*3.14/180
+    //   var x = a*Math.cos(angle)
+    //   var y = a*Math.sin(angle)
+    //   p3.setData(x,y,0)
+    // }, 2000, mina.bounce);
+    //
+
+  </script>
+</body>
+</html>

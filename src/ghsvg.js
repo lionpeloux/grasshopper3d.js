@@ -148,3 +148,36 @@ Object.defineProperties(GHSvg_Polyline.prototype, {
     }
   }
 })
+
+// Add a SVG Circle to a GHCircle
+class GHSvg_Circle extends GHSvg {
+  constructor(snap, id, circle){
+    super(snap, id, "SVGCircle", circle)
+
+    // create an alias
+    this.circle = circle
+
+    // deal with options
+    // var pt = proj.transformVector(this.point)
+    this.svgobj = paper.circle(this.circle.plane.origin.x,this.circle.plane.origin.y,0)
+                        .animate({r: this.circle.r}, 800, mina.bounce)
+
+    // mouse events
+    this.svgobj.data('sender', this);
+    // this.svgobj.drag(dragMove, dragStart, dragEnd)
+  }
+}
+Object.defineProperties(GHSvg_Circle.prototype, {
+  'refresh': {
+    value: function() {
+      // var pt = proj.transformVector(this.point)
+      this.svgobj.attr({
+        cx:this.circle.plane.origin.x,
+        cy:this.circle.plane.origin.y,
+        r :this.circle.r
+      })
+
+      // this.svgobj.attr({cx:this.point.x, cy:this.point.y})
+    },
+  },
+})

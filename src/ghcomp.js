@@ -104,6 +104,46 @@ Object.defineProperties(GHComp_Pts_Mid.prototype, {
   },
 })
 
+// Mid point from two GHPoints
+class GHComp_Circle_3pts extends GHComp {
+  constructor(id, p1, p2, p3){
+    super(id, "Circle3pts")
+
+    // register input parameters
+    this.p1 = this.register_in(p1)
+    this.p2 = this.register_in(p2)
+    this.p2 = this.register_in(p3)
+
+    // register output parameters
+    var res = Circle3pts(p1.point,p2.point,p3.point) // [k, c, t, t1, t2]
+    var r = 1/res.k
+    var xaxis = p1.point.subtract(res.c)
+    var yaxis = res.kb.cross(xaxis)
+    var plane = new Plane(res.c, xaxis, yaxis)
+    this._circle = this.register_out(new GHCircle(id, plane, r))
+
+    // trigger computation
+    this.refresh()
+  }
+}
+Object.defineProperties(GHComp_Circle_3pts.prototype, {
+  'circle': {
+    get: function() { return this._circle },
+  },
+  'refresh': {
+    value: function() {
+      var res = Circle3pts(p1.point,p2.point,p3.point) // [k, c, t, t1, t2]
+      console.log(res);
+      var r = 1/res.k
+      var xaxis = p1.point.subtract(res.c)
+      var yaxis = res.kb.cross(xaxis)
+      var plane = new Plane(res.c, xaxis, yaxis)
+      this._circle._setData(plane, r)
+    },
+  },
+})
+
+
 // Polyline from several GHPoints
 class GHComp_Polyline extends GHComp {
   constructor(id, points){

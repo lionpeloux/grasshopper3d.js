@@ -5,6 +5,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/snap.svg/0.4.1/snap.svg.js"></script>
     <script type="text/javascript" src="../../lib/matrix.js"></script>
     <script type="text/javascript" src="../../lib/vector.js"></script>
+    <script type="text/javascript" src="../../lib/plane.js"></script>
     <script type="text/javascript" src="../../src/ghparam.js"></script>
     <script type="text/javascript" src="../../src/ghcomp.js"></script>
     <script type="text/javascript" src="../../src/ghsvg.js"></script>
@@ -32,7 +33,6 @@
 
     var proj = Matrix.identity()
 
-
     // Set up the svg elements attached to the parametric model
     var polyline = new GHSvg_Polyline(paper, 'SVG Polyline',comp3.polyline).toGroup(g).addClass("line")
     var p1_svg = new GHSvg_Point(paper, 'SVG P1',p1, 20).toGroup(g).addClass("node")
@@ -41,9 +41,6 @@
     var p4_svg = new GHSvg_Point(paper, 'SVG P4',p4, 20).toGroup(g).addClass("node")
 
     var p0_svg = new GHSvg_Point(paper, 'SVG P0',p1, 50).toGroup(g).addClass("node").attr({id:"bob"})
-
-    // p0_svg.svgobj.attr({cx:50, r:100})
-    p0_svg
 
   </script>
 </body>
