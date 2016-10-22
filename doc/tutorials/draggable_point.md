@@ -1,5 +1,3 @@
-# CODE
-
 This is a draggable point.
 
 <div id='example'></div>
@@ -19,15 +17,15 @@ var svg2 = r.Point(p2, 50).addClass('node-blue')
 
 
 <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/snap.svg/0.4.1/snap.svg.js'></script>
-<script type='text/javascript' src='../../lib/matrix.js'></script>
-<script type='text/javascript' src='../../lib/vector.js'></script>
-<script type='text/javascript' src='../../lib/plane.js'></script>
-<script type='text/javascript' src='../../src/interpolation.js'></script>
-<script type='text/javascript' src='../../src/base.js'></script>
-<script type='text/javascript' src='../../src/ghparam.js'></script>
-<script type='text/javascript' src='../../src/ghcomp.js'></script>
-<script type='text/javascript' src='../../src/ghsvg.js'></script>
-<link rel='stylesheet' type='text/css' href='../../css/tutorials.css'>
+<script type='text/javascript' src='./dist/lib/matrix.js'></script>
+<script type='text/javascript' src='./dist/lib/vector.js'></script>
+<script type='text/javascript' src='./dist/lib/plane.js'></script>
+<script type='text/javascript' src='./dist/src/interpolation.js'></script>
+<script type='text/javascript' src='./dist/src/base.js'></script>
+<script type='text/javascript' src='./dist/src/ghparam.js'></script>
+<script type='text/javascript' src='./dist/src/ghcomp.js'></script>
+<script type='text/javascript' src='./dist/src/ghsvg.js'></script>
+<link rel='stylesheet' type='text/css' href='./dist/css/tutorials.css'>
 
 <script>
 
