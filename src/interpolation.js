@@ -26,13 +26,18 @@ function Circle3pts(start, center, end){
 
     var t1 = (u1.multiply(2*(t.dot(u1)))).subtract(t)
     var t2 = (u2.multiply(2*(t.dot(u2)))).subtract(t)
+    var n1 = start.subtract(c).multiply(k)
+    var n2 = end.subtract(c).multiply(k)
 
     var xaxis = center.subtract(c)
     var yaxis = kb.cross(xaxis)
     var plane = new Plane(c,xaxis,yaxis)
 
-    var a1 = - Math.acos(t1.dot(t)) // oriented angle
-    var a2 =   Math.acos(t2.dot(t)) // oriented angle
+    var a1, a2
+    if (n1.cross(n).dot(kb) >= 0) { a1 = - Math.acos(n1.dot(n)) }
+    else { a1 = Math.acos(n1.dot(n)) - 2*Math.PI } // the arc between1-2 is more than half a circle
+    if (n.cross(n2).dot(kb) >= 0) { a2 = Math.acos(n2.dot(n)) }
+    else { a2 = 2*Math.PI - Math.acos(n2.dot(n)) } // the arc between1-2 is more than half a circle
 
     console.log("t1 = " + t1.str() + " " + t1.length());
     console.log("t2 = " + t2.str() + " " + t2.length());
