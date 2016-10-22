@@ -5,10 +5,10 @@
 // components are objects that acte on datas
 
 // global variables to trace refresh
-var debug           = true
-var log_register    = true
-var log_statut      = true
-var log_refresh     = true
+var debug           = false
+var log_register    = false
+var log_statut      = false
+var log_refresh     = false
 var display_decimal = 3
 var arc_as_cbcurve  = false // if true, arc and circles are approximated as Cubic Bezier Curves
 
@@ -325,12 +325,12 @@ Object.defineProperties(GHSolution.prototype, {
   },
   'Vector': {
     value: function(x, y, z) {
-      return this.RegisterRootParam(GHVector(x, y, z))
+      return this.RegisterRootParam(new GHVector(x, y, z))
     }
   },
   'Plane': {
     value: function(origin, xaxis, yaxis) {
-      return this.RegisterRootParam(GHPlane(origin, xaxis, yaxis))
+      return this.RegisterRootParam(new GHPlane(origin, xaxis, yaxis))
     }
   },
   'Circle': {
@@ -338,13 +338,11 @@ Object.defineProperties(GHSolution.prototype, {
       return this.RegisterRootParam(new GHCircle(plane, r))
     }
   },
-  // 'Arc': {
-  //   value: function(plane, r) {
-  //     var param = new GHPlane(this.param_root.length, plane, r)
-  //     this.param_root.push(param)
-  //     return param
-  //   }
-  // },
+  'Arc': {
+    value: function(plane, r, a1, a2) {
+      return this.RegisterRootParam(new GHArc(plane, r, a1, a2))
+    }
+  },
   'Polyline': {
     value: function(points) {
       this.RegisterRootParam(new GHPolyline(points))
@@ -375,6 +373,13 @@ Object.defineProperties(GHSolution.prototype, {
   'Circle3pts': {
     value: function(ghps, ghpc, ghpe) {
       var comp = new GHComp_Circle_3pts(this.comp.length, ghps, ghpc, ghpe)
+      this.RegisterComp(comp)
+      return comp
+    }
+  },
+  'Arc3pts': {
+    value: function(ghps, ghpc, ghpe) {
+      var comp = new GHComp_Arc_3pts(this.comp.length, ghps, ghpc, ghpe)
       this.RegisterComp(comp)
       return comp
     }
@@ -432,6 +437,7 @@ class GHRender {
 Object.defineProperties(GHRender.prototype, {
   'RegisterSvg': {
     value: function(ghsvg) {
+      ghsvg.toGroup(this.mastergrp)
       this.comp_svg.push(ghsvg)
     }
   },
@@ -445,7 +451,6 @@ Object.defineProperties(GHRender.prototype, {
   'Point': {
     value: function(ghpoint, r) {
       var ghsvg = new GHSvg_Point(this.paper, this.viewport, this.comp_svg.length, ghpoint, r)
-      ghsvg.toGroup(this.mastergrp)
       this.RegisterSvg(ghsvg)
       return ghsvg
     }
@@ -453,7 +458,6 @@ Object.defineProperties(GHRender.prototype, {
   'Polyline': {
     value: function(ghpolyline) {
       var ghsvg = new GHSvg_Polyline(this.paper, this.viewport, this.comp_svg.length, ghpolyline)
-      ghsvg.toGroup(this.mastergrp)
       this.RegisterSvg(ghsvg)
       return ghsvg
     }
@@ -461,7 +465,13 @@ Object.defineProperties(GHRender.prototype, {
   'Circle': {
     value: function(ghcircle) {
       var ghsvg = new GHSvg_Circle(this.paper, this.viewport, this.comp_svg.length, ghcircle)
-      ghsvg.toGroup(this.mastergrp)
+      this.RegisterSvg(ghsvg)
+      return ghsvg
+    }
+  },
+  'Arc': {
+    value: function(gharc) {
+      var ghsvg = new GHSvg_Arc(this.paper, this.viewport, this.comp_svg.length, gharc)
       this.RegisterSvg(ghsvg)
       return ghsvg
     }

@@ -24,38 +24,40 @@ function Circle3pts(start, center, end){
     var n = t.cross(kb).divide(k)
     var c = center.subtract(n.multiply(1/k))
 
-    var t1 = (u1.multiply(2*t.dot(u1))).subtract(t)
-    var t2 = (u2.multiply(2*t.dot(u2))).subtract(t)
+    var t1 = (u1.multiply(2*(t.dot(u1)))).subtract(t)
+    var t2 = (u2.multiply(2*(t.dot(u2)))).subtract(t)
 
-    var xaxis = p2.point.subtract(c)
+    var xaxis = center.subtract(c)
     var yaxis = kb.cross(xaxis)
     var plane = new Plane(c,xaxis,yaxis)
 
-    var theta_1 = - Math.acos(t1.dot(t)) // oriented angle
-    var theta_2 =   Math.acos(t2.dot(t)) // oriented angle
+    var a1 = - Math.acos(t1.dot(t)) // oriented angle
+    var a2 =   Math.acos(t2.dot(t)) // oriented angle
 
-    return {plane:plane, theta_1:theta_1, theta_2:theta_2, k:k, kb:kb, c:c, t:t, t1:t1, t2:t2}
+    console.log("t1 = " + t1.str() + " " + t1.length());
+    console.log("t2 = " + t2.str() + " " + t2.length());
+
+    return {plane:plane, a1:a1, a2:a2, k:k, kb:kb, c:c, t:t, t1:t1, t2:t2}
 }
-
-function ArcToCBCurve(plane, r, theta_1, theta_2, angle_max = 1.0471975512){
+function ArcToCBCurve(plane, r, a1, a2, angle_max = 1.0471975512){
   // http://pomax.github.io/bezierinfo/#circles_cubic
   // max angle of a single cubic bezier element
 
-  var n1 = Math.floor(-theta_1/angle_max) + 1
-  var phi_1 = -theta_1/n1 // < 0
+  var n1 = Math.floor(-a1/angle_max) + 1
+  var phi_1 = -a1/n1 // < 0
   var f1 = 4/3*Math.tan(phi_1/4)
   var q1_1 = [r,r*f1]
   var q2_1 = [r*(Math.cos(phi_1)+f1*Math.sin(phi_1)),r*(Math.sin(phi_1)-f1*Math.cos(phi_1))]
 
-  var n2 = Math.floor(theta_2/angle_max) + 1
-  var phi_2 = theta_2/n2 //  > 0
+  var n2 = Math.floor(a2/angle_max) + 1
+  var phi_2 = a2/n2 //  > 0
   var f2 = 4/3*Math.tan(phi_2/4)
   var q1_2 = [r,r*f2]
   var q2_2 = [r*(Math.cos(phi_2)+f2*Math.sin(phi_2)),r*(Math.sin(phi_2)-f2*Math.cos(phi_2))]
 
-  P = []
-  Q1 = []
-  Q2 = []
+  var P = []
+  var Q1 = []
+  var Q2 = []
 
   var theta, c, s
 
@@ -123,7 +125,7 @@ function ArcToCBCurve(plane, r, theta_1, theta_2, angle_max = 1.0471975512){
   }
 
   // add last point
-  theta = n1 * (phi_2)
+  theta = n2 * (phi_2)
   c = Math.cos(theta)
   s = Math.sin(theta)
   P.push(
@@ -336,6 +338,10 @@ function svgpathCBCurve(P, Q1, Q2, viewport) {
       p = P[i+1]
       svgpath += " C" + q1.x + " " +  q1.y + ", " + q2.x + " " +  q2.y + ", " + p.x + " " +  p.y
     }
+    console.log(P.length);
+    console.log(Q1.length);
+    console.log(Q2.length);
+    console.log(P[P.length-1]);
     return svgpath
   }
   else {

@@ -74,6 +74,43 @@ Object.defineProperties(GHComp_Circle_3pts.prototype, {
   },
 })
 
+// Mid point from two GHPoints
+class GHComp_Arc_3pts extends GHComp {
+  constructor(id, ghps, ghpc, ghpe){
+    super(id, "Arc3pts")
+
+    // register input gh parameters
+    this.ghps = this.register_in(ghps)
+    this.ghpc = this.register_in(ghpc)
+    this.ghpe = this.register_in(ghpe)
+
+    // register output gh parameters
+    var res = Circle3pts(this.ghps.point, this.ghpc.point, this.ghpe.point) // [k, c, t, t1, t2]
+    this._arc = this.register_out(new GHArc(res.plane, 1/res.k, res.a1, res.a2))
+    this._center = this.register_out(new GHPoint(res.plane.origin))
+
+    // trigger computation needed ??
+    this.refresh()
+  }
+}
+Object.defineProperties(GHComp_Arc_3pts.prototype, {
+  'arc': {
+    get: function() { return this._arc },
+  },
+  'center': {
+    get: function() { return this._center },
+  },
+  'refresh': {
+    value: function() {
+      var res = Circle3pts(this.ghps.point, this.ghpc.point, this.ghpe.point) // [k, c, t, t1, t2]
+      this._arc._setData(res.plane, 1/res.k, res.a1, res.a2)
+      this._center._setData(res.plane.origin.x, res.plane.origin.y, res.plane.origin.z)
+      this._arc.print()
+    },
+  },
+})
+
+
 // Polyline from several GHPoints
 class GHComp_Polyline extends GHComp {
   constructor(id, points){

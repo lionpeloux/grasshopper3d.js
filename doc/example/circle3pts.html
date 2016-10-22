@@ -19,85 +19,58 @@
   <script>
 
     // Set Up the grasshopper3d.js parametric model
-    var a = 200
-    var angle = -90*3.14/180
+    var a = 100
+    var angle = 90*3.14/180
     var x = a*Math.cos(angle)
     var y = a*Math.sin(angle)
 
     var s = new GHSolution()
-    var p1 = s.Point(-a,0,0)
-    var p2 = s.Point(0,0,0)
-    var p3 = s.Point(x,y,0)
+    var p1 = s.Point(-1.2*a,0,0)
+    var p2 = s.Point(0,a,0)
+    var p3 = s.Point(a,0,0)
 
-    var cp1 = s.PolylineFromPts([p1,p2,p3])
-    var cp2 = s.Circle3pts(p1,p2,p3)
+    // var cp1 = s.PolylineFromPts([p1,p2,p3])
+    // var cp2 = s.Circle3pts(p1,p2,p3)
+    var cp3 = s.Arc3pts(p1,p2,p3)
+
 
 
     var r = new GHRender(600,400)
 
-    var svgply1 = r.Polyline(cp1.polyline).addClass('line')
-    var svgcirc = r.Circle(cp2.circle)
-
-
+    // var svgply1 = r.Polyline(cp1.polyline).addClass('line')
+    // var svgcirc = r.Circle(cp2.circle)
+    var svgarc = r.Arc(cp3.arc).addClass('line')
     var svgp1 = r.Point(p1, 10).addClass('node-red')
     var svgp2 = r.Point(p2, 10).addClass('node-red')
     var svgp3 = r.Point(p3, 10).addClass('node-red')
-
-    console.log(cp2);
-    var svgp4 = r.Point(cp2.center, 5).addClass('line')
-
-
     //
-    //
-    // // Set Up the SVG Viewport
-    // var width = 1080;
-    // var height = 720;
-    // var paper = Snap(width,height);
-    // var g = paper.g();
-    // g.attr({id:'cartesian'});
-    // g.attr({transform:'translate('+width/2+','+height/2+') scale(1,-1)'});
-    // var box = paper.rect(-width/2, -height/2, width, height).attr({strokeWidth:'1px', stroke:'black', fill:'none'})
-    // g.add(box)
-    //
-    // var proj = Matrix.identity()
-    //
-    // // Set up the svg elements attached to the parametric model
-    // var p1_svg = new GHSvg_Point(paper, 'SVG P1',p1, 10).toGroup(g).addClass('node')
-    // var p2_svg = new GHSvg_Point(paper, 'SVG P2',p2, 10).toGroup(g).addClass('node')
-    // var p3_svg = new GHSvg_Point(paper, 'SVG P3',p3, 10).toGroup(g).addClass('node')
-    //
-    //
-    // var polyline = new GHSvg_Polyline(paper, 'SVG Polyline',comp1.polyline).toGroup(g).addClass('line')
-    //
-    // var pl = Plane.XY()
-    // var c1 = new GHCircle('C1', pl, 200)
-    // var c1_svg = new GHSvg_Circle(paper, 'SVG C1', c1).toGroup(g).addClass('line')
-    // var c2_svg = new GHSvg_Circle(paper, 'SVG C2', comp2.circle).toGroup(g).addClass('line')
-    //
+    // // console.log(cp2);
+    var svgp4 = r.Point(cp3.center, 5).addClass('line')
 
 
+    // angle = 0*3.14/180
+    // p3.setData(a*Math.cos(angle),a*Math.sin(angle),0)
 
+    var param = {val:1e-2}
 
-    // var param = {val:1e-2}
-    //
-    // TweenMax.to(param, 2, {
+    // TweenMax.to(param, 10, {
     //   val:(180-1e-2),
-    //   repeat: 3,
+    //   repeat: 0,
     //   yoyo: true,
     //   onUpdate:applyValue,
     //   onUpdateParams:[param.val]
     // })
     //
     //   function applyValue (val){
-    //       console.log(''); //always passes 100
-    //       console.log('------------------'); //always passes 100
-    //   	 console.log(param.val); //always passes 100
-    //      console.log('------------------'); //always passes 100
+    //     console.log(''); //always passes 100
+    //     console.log('------------------'); //always passes 100
+    //     console.log(param.val); //always passes 100
+    //     console.log('------------------'); //always passes 100
     //
-    //      var angle = param.val*3.14/180
-    //      var x = a*Math.cos(angle)
-    //      var y = a*Math.sin(angle)
-    //      p3.setData(x,y,0)
+    //     var angle = param.val*3.14/180
+    //     var x = a*Math.cos(angle)
+    //     var y = a*Math.sin(angle)
+    //     p3.setData(x,y,0)
     // };
 
 

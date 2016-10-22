@@ -59,6 +59,9 @@ var dragMove = function(dx, dy, x, y, e) {
         sender.ghpoint.setData(this.data('ox') + tdx, this.data('oy') + tdy, 0)
 }
 var dragEnd = function() {
+  var sender = this.data('sender')
+  sender.ghpoint.print()
+  console.log(sender.ghpoint.comp_out[1])
 }
 
 // Add a SVG Polyline to a GHPolyline
@@ -119,6 +122,32 @@ Object.defineProperties(GHSvg_Circle.prototype, {
         r :this.ghcircle.r
       })
       // this.svgobj.attr({cx:this.point.x, cy:this.point.y})
+    },
+  },
+})
+
+// Add a SVG Circle to a GHCircle
+class GHSvg_Arc extends GHSvg {
+  constructor(paper, viewport, id, gharc){
+    super(paper, viewport, id, 'SVGArc')
+
+    // register input parameters
+    this.gharc = this.register_in(gharc)
+
+    // create and register svg elements
+    console.log(gharc);
+    var res2 = ArcToCBCurve(this.gharc.plane, this.gharc.r, this.gharc.a1, this.gharc.a2, 3.14/8)
+    console.log(res2);
+    var path  = svgpathCBCurve(res2[0], res2[1], res2[2])
+    this.svgpath = this.register_svg(paper.path(path))
+  }
+}
+Object.defineProperties(GHSvg_Arc.prototype, {
+  'refresh': {
+    value: function() {
+      var res2 = ArcToCBCurve(this.gharc.plane, this.gharc.r, this.gharc.a1, this.gharc.a2, 3.14/8)
+      var path  = svgpathCBCurve(res2[0], res2[1], res2[2])
+      this.svgpath.attr({d:path})
     },
   },
 })
