@@ -24,6 +24,24 @@ function Matrix() {
 }
 
 Matrix.prototype = {
+  _setData: function(m) { // in place modification of a Vector
+    this.m[0] = m.m[0]
+    this.m[1] = m.m[1]
+    this.m[2] = m.m[2]
+    this.m[3] = m.m[3]
+    this.m[4] = m.m[4]
+    this.m[5] = m.m[5]
+    this.m[6] = m.m[6]
+    this.m[7] = m.m[7]
+    this.m[8] = m.m[8]
+    this.m[9] = m.m[9]
+    this.m[10] = m.m[10]
+    this.m[11] = m.m[11]
+    this.m[12] = m.m[12]
+    this.m[13] = m.m[13]
+    this.m[14] = m.m[14]
+    this.m[15] = m.m[15]
+  },
   // ### .inverse()
   //
   // Returns the matrix that when multiplied with this matrix results in the
@@ -71,6 +89,28 @@ Matrix.prototype = {
       m[4] * v.x + m[5] * v.y + m[6] * v.z,
       m[8] * v.x + m[9] * v.y + m[10] * v.z
     );
+  },
+  // ### .equals(matrix)
+  //
+  // Test for equality of all coefficients
+  equals: function(q) {
+    var m = this.m
+    for (var i = 0; i < m.length; i++) {
+      if (m[i]!=q[i]) { return false }
+    }
+    return true
+  },
+
+  // ### .isIdentity(matrix)
+  //
+  // Test if a given matrix is the identity matrix
+  isIdentity: function() {
+    var m = this.m
+    var b = (m[0]==1 && m[5]==1 && m[10]==1 && m[15]==1)
+    b &= (m[1]==0 && m[2]==0 && m[3]==0 && m[4]==0)
+    b &= (m[6]==0 && m[7]==0 && m[8]==0 && m[9]==0)
+    b &= (m[11]==0 && m[12]==0 && m[13]==0 && m[14]==0)
+    return b;
   }
 };
 

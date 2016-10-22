@@ -11,6 +11,15 @@ function Vector(x, y, z) {
 // The methods `add()`, `subtract()`, `multiply()`, and `divide()` can all
 // take either a vector or a number as an argument.
 Vector.prototype = {
+  str: function() { // return a string
+    var n = - display_decimal
+    return "(" + Math.round10(this.x,n)  + ", " + Math.round10(this.y,n)  + ", " + Math.round10(this.z,n)  + ")"
+  },
+  _setData: function(x, y, z) { // in place modification of a Vector
+    this.x = x
+    this.y = y
+    this.z = z
+  },
   negative: function() {
     return new Vector(-this.x, -this.y, -this.z);
   },
@@ -138,3 +147,52 @@ Vector.fromArray = function(a) {
 Vector.angleBetween = function(a, b) {
   return a.angleTo(b);
 };
+
+(function() {
+  /**
+   * Ajustement décimal d'un nombre
+   *
+   * @param {String}  type : Le type d'ajustement souhaité.
+   * @param {Number}  value : le nombre à traité The number.
+   * @param {Integer} exp  : l'exposant (le logarithme en base 10 de l'ajustement).
+   * @returns {Number} la valeur ajustée.
+   */
+  function decimalAdjust(type, value, exp) {
+    // Si la valeur de exp n'est pas définie ou vaut zéro...
+    if (typeof exp === 'undefined' || +exp === 0) {
+      return Math[type](value);
+    }
+    value = +value;
+    exp = +exp;
+    // Si la valeur n'est pas un nombre
+    // ou si exp n'est pas un entier...
+    if (isNaN(value) || !(typeof exp === 'number' && exp % 1 === 0)) {
+      return NaN;
+    }
+    // Décalage
+    value = value.toString().split('e');
+    value = Math[type](+(value[0] + 'e' + (value[1] ? (+value[1] - exp) : -exp)));
+    // Décalage inversé
+    value = value.toString().split('e');
+    return +(value[0] + 'e' + (value[1] ? (+value[1] + exp) : exp));
+  }
+
+  // Arrondi décimal
+  if (!Math.round10) {
+    Math.round10 = function(value, exp) {
+      return decimalAdjust('round', value, exp);
+    };
+  }
+  // Arrondi décimal inférieur
+  if (!Math.floor10) {
+    Math.floor10 = function(value, exp) {
+      return decimalAdjust('floor', value, exp);
+    };
+  }
+  // Arrondi décimal supérieur
+  if (!Math.ceil10) {
+    Math.ceil10 = function(value, exp) {
+      return decimalAdjust('ceil', value, exp);
+    };
+  }
+})();
