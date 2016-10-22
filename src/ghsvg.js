@@ -59,9 +59,6 @@ var dragMove = function(dx, dy, x, y, e) {
         sender.ghpoint.setData(this.data('ox') + tdx, this.data('oy') + tdy, 0)
 }
 var dragEnd = function() {
-  var sender = this.data('sender')
-  sender.ghpoint.print()
-  console.log(sender.ghpoint.comp_out[1])
 }
 
 // Add a SVG Polyline to a GHPolyline
@@ -131,15 +128,31 @@ class GHSvg_Arc extends GHSvg {
   constructor(paper, viewport, id, gharc){
     super(paper, viewport, id, 'SVGArc')
 
+    this.paper = paper
+
     // register input parameters
     this.gharc = this.register_in(gharc)
 
     // create and register svg elements
-    console.log(gharc);
     var res2 = ArcToCBCurve(this.gharc.plane, this.gharc.r, this.gharc.a1, this.gharc.a2, 3.14/8)
-    console.log(res2);
     var path  = svgpathCBCurve(res2[0], res2[1], res2[2])
     this.svgpath = this.register_svg(paper.path(path))
+
+    // Add interpolation pts
+    for (var i = 0; i < res2[0].length; i++) {
+      this.register_svg(paper.circle(res2[0][i].x, res2[0][i].y, 5).addClass('cp'))
+    }
+    // Add controle pts
+    for (var i = 0; i < res2[1].length; i++) {
+      this.register_svg(paper.circle(res2[1][i].x, res2[1][i].y, 2).addClass('knot'))
+    }
+    for (var i = 0; i < res2[2].length; i++) {
+      this.register_svg(paper.circle(res2[2][i].x, res2[2][i].y, 2).addClass('knot'))
+    }
+
+    // create a sub group if contains several svgelements
+    this.group()
+
   }
 }
 Object.defineProperties(GHSvg_Arc.prototype, {
@@ -148,6 +161,30 @@ Object.defineProperties(GHSvg_Arc.prototype, {
       var res2 = ArcToCBCurve(this.gharc.plane, this.gharc.r, this.gharc.a1, this.gharc.a2, 3.14/8)
       var path  = svgpathCBCurve(res2[0], res2[1], res2[2])
       this.svgpath.attr({d:path})
+
+      var el
+      var del = this.svgobj.splice(1,this.svgobj.length-1)
+      for (var i = 0; i < del.length; i++) {
+        del[i].remove()
+      }
+      // Add interpolation pts
+      for (var i = 0; i < res2[0].length; i++) {
+        el = this.paper.circle(res2[0][i].x, res2[0][i].y, 4).addClass('cp')
+        this.grp.add(el)
+        this.register_svg(el)
+      }
+
+      // Add controle pts
+      for (var i = 0; i < res2[1].length; i++) {
+        el = this.paper.circle(res2[1][i].x, res2[1][i].y, 2).addClass('knot')
+        this.grp.add(el)
+        this.register_svg(el)
+      }
+      for (var i = 0; i < res2[2].length; i++) {
+        el = this.paper.circle(res2[2][i].x, res2[2][i].y, 2).addClass('knot')
+        this.grp.add(el)
+        this.register_svg(el)
+      }
     },
   },
 })

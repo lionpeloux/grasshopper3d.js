@@ -105,7 +105,6 @@ Object.defineProperties(GHComp_Arc_3pts.prototype, {
       var res = Circle3pts(this.ghps.point, this.ghpc.point, this.ghpe.point) // [k, c, t, t1, t2]
       this._arc._setData(res.plane, 1/res.k, res.a1, res.a2)
       this._center._setData(res.plane.origin.x, res.plane.origin.y, res.plane.origin.z)
-      this._arc.print()
     },
   },
 })

@@ -39,9 +39,6 @@ function Circle3pts(start, center, end){
     if (n.cross(n2).dot(kb) >= 0) { a2 = Math.acos(n2.dot(n)) }
     else { a2 = 2*Math.PI - Math.acos(n2.dot(n)) } // the arc between1-2 is more than half a circle
 
-    console.log("t1 = " + t1.str() + " " + t1.length());
-    console.log("t2 = " + t2.str() + " " + t2.length());
-
     return {plane:plane, a1:a1, a2:a2, k:k, kb:kb, c:c, t:t, t1:t1, t2:t2}
 }
 function ArcToCBCurve(plane, r, a1, a2, angle_max = 1.0471975512){
@@ -321,8 +318,8 @@ function svgpathPolyline(P, viewport) {
     p = viewport.transformVector(P[0])
     svgpath += "M" + p.x + " " +  p.y
     for (var i = 1; i < P.length; i++) {
-      pt = viewport.transformVector(P[i])
-      svg += " L" + p.x + " " +  p.y
+      p = viewport.transformVector(P[i])
+      svgpath += " L" + p.x + " " +  p.y
     }
     return svgpath
   }
@@ -343,10 +340,6 @@ function svgpathCBCurve(P, Q1, Q2, viewport) {
       p = P[i+1]
       svgpath += " C" + q1.x + " " +  q1.y + ", " + q2.x + " " +  q2.y + ", " + p.x + " " +  p.y
     }
-    console.log(P.length);
-    console.log(Q1.length);
-    console.log(Q2.length);
-    console.log(P[P.length-1]);
     return svgpath
   }
   else {

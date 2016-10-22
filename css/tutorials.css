@@ -22,6 +22,27 @@
   stroke-opacity: .2;
 }
 
+.knot {
+	/*-moz-border-radius: 1.418px 1.417px 1.418px 1.417px / 1.417px 1.417px 1.417px 1.417px;
+	-webkit-border-radius: 1.418px 1.417px 1.418px 1.417px / 1.417px 1.417px 1.417px 1.417px;
+	border-radius: 1.418px 1.417px 1.418px 1.417px / 1.417px 1.417px 1.417px 1.417px;*/
+	fill: blue;
+  fill-opacity: 0.6
+  stroke: blue;
+  stroke-width: 3;
+  stroke-opacity: .2;
+}
+
+.cp {
+	/*-moz-border-radius: 1.418px 1.417px 1.418px 1.417px / 1.417px 1.417px 1.417px 1.417px;
+	-webkit-border-radius: 1.418px 1.417px 1.418px 1.417px / 1.417px 1.417px 1.417px 1.417px;
+	border-radius: 1.418px 1.417px 1.418px 1.417px / 1.417px 1.417px 1.417px 1.417px;*/
+	fill: black;
+  stroke: black;
+  stroke-width: 0;
+  stroke-opacity: .2;
+}
+
 .cube {
 	/*-moz-border-radius: 1.418px 1.417px 1.418px 1.417px / 1.417px 1.417px 1.417px 1.417px;
 	-webkit-border-radius: 1.418px 1.417px 1.418px 1.417px / 1.417px 1.417px 1.417px 1.417px;

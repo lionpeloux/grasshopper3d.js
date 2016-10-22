@@ -53,25 +53,25 @@
 
     var param = {val:1e-2}
 
-    // TweenMax.to(param, 10, {
-    //   val:(180-1e-2),
-    //   repeat: 0,
-    //   yoyo: true,
-    //   onUpdate:applyValue,
-    //   onUpdateParams:[param.val]
-    // })
-    //
-    //   function applyValue (val){
-    //     console.log(''); //always passes 100
-    //     console.log('------------------'); //always passes 100
-    //     console.log(param.val); //always passes 100
-    //     console.log('------------------'); //always passes 100
-    //
-    //     var angle = param.val*3.14/180
-    //     var x = a*Math.cos(angle)
-    //     var y = a*Math.sin(angle)
-    //     p3.setData(x,y,0)
-    // };
+    TweenMax.to(param, 5, {
+      val:(180-1e-2),
+      repeat: 4,
+      yoyo: true,
+      onUpdate:applyValue,
+      onUpdateParams:[param.val]
+    })
+
+      function applyValue (val){
+        console.log(''); //always passes 100
+        console.log('------------------'); //always passes 100
+        console.log(param.val); //always passes 100
+        console.log('------------------'); //always passes 100
+
+        var angle = param.val*3.14/180
+        var x = a*Math.cos(angle)
+        var y = a*Math.sin(angle)
+        p3.setData(x,y,0)
+    };
 
 
 

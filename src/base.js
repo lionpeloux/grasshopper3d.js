@@ -435,44 +435,50 @@ class GHRender {
 }
 // GHRender Methodes
 Object.defineProperties(GHRender.prototype, {
-  'RegisterSvg': {
+  'registerSvg': {
     value: function(ghsvg) {
       ghsvg.toGroup(this.mastergrp)
       this.comp_svg.push(ghsvg)
     }
   },
-  'Redraw': { // to be called after a change of viewport
+  'redraw': { // to be called after a change of viewport
     value: function() {
       for (var i = 0; i < this.comp_svg.length; i++) {
         this.comp_svg[i].refresh()
       }
     }
   },
+  'setViewport': {
+    value: function(viewport) {
+      this.viewport._setData(viewport)
+      this.redraw()
+    }
+  },
   'Point': {
     value: function(ghpoint, r) {
       var ghsvg = new GHSvg_Point(this.paper, this.viewport, this.comp_svg.length, ghpoint, r)
-      this.RegisterSvg(ghsvg)
+      this.registerSvg(ghsvg)
       return ghsvg
     }
   },
   'Polyline': {
     value: function(ghpolyline) {
       var ghsvg = new GHSvg_Polyline(this.paper, this.viewport, this.comp_svg.length, ghpolyline)
-      this.RegisterSvg(ghsvg)
+      this.registerSvg(ghsvg)
       return ghsvg
     }
   },
   'Circle': {
     value: function(ghcircle) {
       var ghsvg = new GHSvg_Circle(this.paper, this.viewport, this.comp_svg.length, ghcircle)
-      this.RegisterSvg(ghsvg)
+      this.registerSvg(ghsvg)
       return ghsvg
     }
   },
   'Arc': {
     value: function(gharc) {
       var ghsvg = new GHSvg_Arc(this.paper, this.viewport, this.comp_svg.length, gharc)
-      this.RegisterSvg(ghsvg)
+      this.registerSvg(ghsvg)
       return ghsvg
     }
   },

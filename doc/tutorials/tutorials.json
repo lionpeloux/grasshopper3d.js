@@ -9,6 +9,9 @@
     "title": "Midpoints"
   },
   "circle3pts": {
-    "title": "Circle from 3 points"
+    "title": "Circle through 3 points"
+  },
+  "arc3pts": {
+    "title": "Arc through 3 points"
   }
 }
