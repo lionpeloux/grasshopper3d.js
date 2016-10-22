@@ -5,11 +5,12 @@
 // components are objects that acte on datas
 
 // global variables to trace refresh
-var debug         = true
-var log_register  = true
-var log_statut    = true
-var log_refresh   = true
+var debug           = true
+var log_register    = true
+var log_statut      = true
+var log_refresh     = true
 var display_decimal = 3
+var arc_as_cbcurve  = false // if true, arc and circles are approximated as Cubic Bezier Curves
 
 // =============================================================================
 //  BASE CLASSES
@@ -23,10 +24,11 @@ var display_decimal = 3
  * @param {string} author - The author of the book.
  */
 class GHParam {
-  constructor(id, type){
-    this.id = id            // unique id = 0, ..., N
+  constructor(type){
+    this.id = -1            // unique id = 0, ..., N
     this.type = type        // param type
     this.isupdated = true   // false if the value is waiting to be computed
+    this.isroot = false     // true if this is a root parameter (default to false)
     this.comp_out = []      // register all dependents components
     this.svg_out = []       // register all dependents svgobj
   }
@@ -305,42 +307,35 @@ class GHSolution {
 Object.defineProperties(GHSolution.prototype, {
   'RegisterRootParam': {
     value: function(param) {
+      param.id = this.param_root.length
       this.param_root.push(param)
+      param.isroot = true
+      return param
     }
   },
   'Number': {
     value: function(num) {
-      var param = new GHNumber(this.param_root.length, num)
-      this.RegisterRootParam(param)
-      return param
+      return this.RegisterRootParam(new GHNumber(num))
     }
   },
   'Point': {
     value: function(x, y, z) {
-      var param = new GHPoint(this.param_root.length, x, y, z)
-      this.RegisterRootParam(param)
-      return param
+      return this.RegisterRootParam(new GHPoint(x, y, z))
     }
   },
   'Vector': {
     value: function(x, y, z) {
-      var param = new GHVector(this.param_root.length, x, y, z)
-      this.RegisterRootParam(param)
-      return param
+      return this.RegisterRootParam(GHVector(x, y, z))
     }
   },
   'Plane': {
     value: function(origin, xaxis, yaxis) {
-      var param = new GHPlane(this.param_root.length, origin, xaxis, yaxis)
-      this.RegisterRootParam(param)
-      return param
+      return this.RegisterRootParam(GHPlane(origin, xaxis, yaxis))
     }
   },
   'Circle': {
     value: function(plane, r) {
-      var param = new GHCircle(this.param_root.length, plane, r)
-      this.RegisterRootParam(param)
-      return param
+      return this.RegisterRootParam(new GHCircle(plane, r))
     }
   },
   // 'Arc': {
@@ -352,9 +347,7 @@ Object.defineProperties(GHSolution.prototype, {
   // },
   'Polyline': {
     value: function(points) {
-      var param = new GHPolyline(this.param_root.length, points)
-      this.RegisterRootParam(param)
-      return param
+      this.RegisterRootParam(new GHPolyline(points))
     }
   },
 })
@@ -373,15 +366,15 @@ Object.defineProperties(GHSolution.prototype, {
     }
   },
   'MidPoint': {
-    value: function(p1, p2) {
-      var comp = new GHComp_Pts_Mid(this.comp.length, p1, p2)
+    value: function(ghp1, ghp2) {
+      var comp = new GHComp_Pts_Mid(this.comp.length, ghp1, ghp2)
       this.RegisterComp(comp)
       return comp
     }
   },
   'Circle3pts': {
-    value: function(ps, pc, pe) {
-      var comp = new GHComp_Circle_3pts(this.comp.length, ps, pc, pe)
+    value: function(ghps, ghpc, ghpe) {
+      var comp = new GHComp_Circle_3pts(this.comp.length, ghps, ghpc, ghpe)
       this.RegisterComp(comp)
       return comp
     }
@@ -407,21 +400,28 @@ Object.defineProperties(GHSolution.prototype, {
  * @param {string} author - The author of the book.
  */
 class GHRender {
-  constructor(width=710, height=400){
+  constructor(width=710, height=400, htmltag){
     this.viewport   =  Matrix.identity()  // global transformation matrix to apply for drawing 3D to 2D
     this.comp_svg = []                   // register all ghsvg instances in the current render
     this.isupdated  = true                // false if the render needs to be redrawn
 
     // create cartesian centered snap paper with a border
+
     this.width      = width
     this.height     = height
-    this.paper      = Snap(this.width,this.height);
+    this.paper      = Snap(this.width,this.height)
     this.mastergrp  = this.paper.g()
                                 .attr({id:"cartesian"})
                                 .attr({transform:"translate("+this.width/2+","+this.height/2+") scale(1,-1)"})
     this.borderbox  = this.paper.rect(-this.width/2, -this.height/2, this.width, this.height)
                            .attr({strokeWidth:"1px", stroke:"black", fill:"none"})
     this.mastergrp.add(this.borderbox)
+
+    // append the paper to the given htmltag
+    if (htmltag === undefined) {} else {
+      this.paper.attr({style:'display:block; margin:auto'})
+      Snap(htmltag).append(this.paper)
+    }
 
     // how to deal with groups ?
     // how to deal with markers ?
@@ -445,6 +445,22 @@ Object.defineProperties(GHRender.prototype, {
   'Point': {
     value: function(ghpoint, r) {
       var ghsvg = new GHSvg_Point(this.paper, this.viewport, this.comp_svg.length, ghpoint, r)
+      ghsvg.toGroup(this.mastergrp)
+      this.RegisterSvg(ghsvg)
+      return ghsvg
+    }
+  },
+  'Polyline': {
+    value: function(ghpolyline) {
+      var ghsvg = new GHSvg_Polyline(this.paper, this.viewport, this.comp_svg.length, ghpolyline)
+      ghsvg.toGroup(this.mastergrp)
+      this.RegisterSvg(ghsvg)
+      return ghsvg
+    }
+  },
+  'Circle': {
+    value: function(ghcircle) {
+      var ghsvg = new GHSvg_Circle(this.paper, this.viewport, this.comp_svg.length, ghcircle)
       ghsvg.toGroup(this.mastergrp)
       this.RegisterSvg(ghsvg)
       return ghsvg

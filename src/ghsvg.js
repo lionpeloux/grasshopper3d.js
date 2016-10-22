@@ -22,13 +22,16 @@ class GHSvg_Point extends GHSvg {
     // create a sub group if contains several svgelements
     // this.group()
 
-    // mouse events are binded to the circle
-    this.svgcircle.data('sender', this);
-    this.svgcircle.drag(
-      dragMove,
-      dragStart,
-      dragEnd
-    )
+    if (this.ghpoint.isroot) {
+      // mouse events are binded to the circle
+      this.svgcircle.data('sender', this);
+      this.svgcircle.drag(
+        dragMove,
+        dragStart,
+        dragEnd
+      )
+    }
+
 
     this.refresh()
   }
@@ -59,79 +62,63 @@ var dragEnd = function() {
 }
 
 // Add a SVG Polyline to a GHPolyline
-// class GHSvg_Polyline extends GHSvg {
-//   constructor(snap, id, polyline){
-//     super(snap, id, "SVGPolyline", polyline)
-//
-//     // create an alias
-//     this.polyline = this.param
-//
-//     // deal with options
-//     var path = this.svgPath(this.polyline.points)
-//     this.svgobj = paper.path(path)
-//
-//     // mouse events
-//     this.svgobj.data('sender', this);
-//   }
-// }
-// Object.defineProperties(GHSvg_Polyline.prototype, {
-//   'refresh': {
-//     value: function() {
-//       var path = this.svgPath(this.polyline.points)
-//       this.svgobj.attr({d:path})
-//     },
-//   },
-//   'svgPath': {
-//     value: function(points) {
-//       var pt
-//       var svg = ""
-//
-//       pt = proj.transformVector(points[0])
-//       svg += "M" + pt.x + " " +  pt.y
-//       for (var i = 1; i < points.length; i++) {
-//         pt = proj.transformVector(points[i])
-//         svg += " L" + pt.x + " " +  pt.y
-//       }
-//
-//       // svg += "M" + points[0].x + " " +  points[0].y
-//       // for (var i = 1; i < points.length; i++) {
-//       //   svg += " L" + points[i].x + " " +  points[i].y
-//       // }
-//
-//       return svg
-//     }
-//   }
-// })
+class GHSvg_Polyline extends GHSvg {
+  constructor(paper, viewport, id, ghpolyline){
+    super(paper, viewport, id, 'SVGPolyline')
+
+    // register input parameters
+    this.ghpolyline = this.register_in(ghpolyline)
+
+    // create and register svg elements
+    var path = svgpathPolyline(this.ghpolyline.points, this.viewport)
+    this.svgpath = this.register_svg(paper.path(path))
+
+    // create a sub group if contains several svgelements
+    // this.group()
+  }
+}
+Object.defineProperties(GHSvg_Polyline.prototype, {
+  'refresh': {
+    value: function() {
+      var path = svgpathPolyline(this.ghpolyline.points, this.viewport)
+      this.svgpath.attr({d:path})
+    },
+  },
+})
 
 // Add a SVG Circle to a GHCircle
-// class GHSvg_Circle extends GHSvg {
-//   constructor(snap, id, circle){
-//     super(snap, id, "SVGCircle", circle)
-//
-//     // create an alias
-//     this.circle = circle
-//
-//     // deal with options
-//     // var pt = proj.transformVector(this.point)
-//     this.svgobj = paper.circle(this.circle.plane.origin.x,this.circle.plane.origin.y,0)
-//                         .animate({r: this.circle.r}, 800, mina.bounce)
-//
-//     // mouse events
-//     this.svgobj.data('sender', this);
-//     // this.svgobj.drag(dragMove, dragStart, dragEnd)
-//   }
-// }
-// Object.defineProperties(GHSvg_Circle.prototype, {
-//   'refresh': {
-//     value: function() {
-//       // var pt = proj.transformVector(this.point)
-//       this.svgobj.attr({
-//         cx:this.circle.plane.origin.x,
-//         cy:this.circle.plane.origin.y,
-//         r :this.circle.r
-//       })
-//
-//       // this.svgobj.attr({cx:this.point.x, cy:this.point.y})
-//     },
-//   },
-// })
+class GHSvg_Circle extends GHSvg {
+  constructor(paper, viewport, id, ghcircle){
+    super(paper, viewport, id, 'SVGCircle')
+
+    // register input parameters
+    this.ghcircle = this.register_in(ghcircle)
+
+    // create and register svg elements
+    this.svgelem = this.register_svg(paper.circle(this.ghcircle.origin.x, this.ghcircle.origin.y, this.ghcircle.r).addClass('line'))
+
+    // mouse events
+    if (this.ghcircle.isroot) {
+      // mouse events are binded to the circle
+      this.svgcircle.data('sender', this);
+      this.svgcircle.drag(
+        dragMove,
+        dragStart,
+        dragEnd
+      )
+    }
+  }
+}
+Object.defineProperties(GHSvg_Circle.prototype, {
+  'refresh': {
+    value: function() {
+      // var pt = proj.transformVector(this.point)
+      this.svgelem.attr({
+        cx:this.ghcircle.origin.x,
+        cy:this.ghcircle.origin.y,
+        r :this.ghcircle.r
+      })
+      // this.svgobj.attr({cx:this.point.x, cy:this.point.y})
+    },
+  },
+})

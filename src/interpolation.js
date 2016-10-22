@@ -37,7 +37,7 @@ function Circle3pts(start, center, end){
     return {plane:plane, theta_1:theta_1, theta_2:theta_2, k:k, kb:kb, c:c, t:t, t1:t1, t2:t2}
 }
 
-function ArcToBezier(plane, r, theta_1, theta_2, angle_max = 1.0471975512){
+function ArcToCBCurve(plane, r, theta_1, theta_2, angle_max = 1.0471975512){
   // http://pomax.github.io/bezierinfo/#circles_cubic
   // max angle of a single cubic bezier element
 
@@ -203,22 +203,7 @@ function bezier_fitting(points, alpha) {
 
   return [Q1, Q2]
 }
-
-function InterpSVG(points, Q1, Q2){
-
-  var n = points.length
-  var svg = ""
-
-  svg += "M" + points[0].x + " " +  points[0].y
-  for (var i = 0; i < n-1; i++) {
-    svg += " C" + Q1[i].x + " " +  Q1[i].y + ", " + Q2[i].x + " " +  Q2[i].y + ", " + points[i+1].x + " " +  points[i+1].y
-  }
-
-  return svg
-
-}
-
-var catmullRomFitting = function (points,alpha) {
+function catmullRomFitting(points,alpha) {
 
     if (alpha == 0 || alpha === undefined) {
       return false;
@@ -309,3 +294,59 @@ var catmullRomFitting = function (points,alpha) {
       return [Q1, Q2];
     }
 };
+
+// construct a svgpath Polyline Path given an array of 3D points
+function svgpathPolyline(P, viewport) {
+  var p, svgpath
+
+  svgpath = ""
+
+  if (viewport === undefined || viewport.isIdentity()) {
+    p = P[0]
+    svgpath += "M" + p.x + " " +  p.y
+    for (var i = 1; i < P.length; i++) {
+      p = P[i]
+      svgpath += " L" + p.x + " " +  p.y
+    }
+    return svgpath
+  }
+  else {
+    p = viewport.transformVector(P[0])
+    svgpath += "M" + p.x + " " +  p.y
+    for (var i = 1; i < P.length; i++) {
+      pt = viewport.transformVector(P[i])
+      svg += " L" + p.x + " " +  p.y
+    }
+    return svgpath
+  }
+}
+
+// construct a svgpath Cubic Bezier Path given an array of 3D points and control points
+function svgpathCBCurve(P, Q1, Q2, viewport) {
+  var p, q1, q2, svgpath
+
+  svgpath = ""
+
+  if (viewport === undefined || viewport.isIdentity()) {
+    p = P[0]
+    svgpath += "M" + p.x + " " +  p.y
+    for (var i = 0; i < P.length-1; i++) {
+      q1 = Q1[i]
+      q2 = Q2[i]
+      p = P[i+1]
+      svgpath += " C" + q1.x + " " +  q1.y + ", " + q2.x + " " +  q2.y + ", " + p.x + " " +  p.y
+    }
+    return svgpath
+  }
+  else {
+    p = viewport.transformVector(P[0])
+    svgpath += "M" + p.x + " " +  p.y
+    for (var i = 0; i < P.length-1; i++) {
+      q1 = viewport.transformVector(Q1[i])
+      q2 = viewport.transformVector(Q2[i])
+      p = viewport.transformVector(P[i+1])
+      svgpath += " C" + q1.x + " " +  q1.y + ", " + q2.x + " " +  q2.y + ", " + p.x + " " +  p.y
+    }
+    return svg
+  }
+}

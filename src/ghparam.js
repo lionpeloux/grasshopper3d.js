@@ -6,8 +6,8 @@
 
 // Number Parameter
 class GHNumber extends GHParam {
-  constructor(id, number) {
-    super(id, 'Number')
+  constructor(number) {
+    super('Number')
     this.number = number
   }
 }
@@ -40,8 +40,8 @@ Object.defineProperties(GHNumber.prototype, {
 
 // Point Parameter
 class GHPoint extends GHParam {
-  constructor(id, x, y, z) {
-    super(id, 'Point')
+  constructor(x, y, z) {
+    super('Point')
     this.point = new Vector(x,y,z)
   }
 }
@@ -99,8 +99,8 @@ Object.defineProperties(GHPoint.prototype, {
 
 // Vector Parameter
 class GHVector extends GHParam {
-  constructor(id, x, y, z) {
-    super(id, 'Vector')
+  constructor(x, y, z) {
+    super('Vector')
     this.vector = new Vector(x,y,z)
   }
 }
@@ -158,8 +158,8 @@ Object.defineProperties(GHVector.prototype, {
 
 // Plane Parameter
 class GHPlane extends GHParam {
-  constructor(id, origin, xaxis, yaxis) {
-    super(id, 'Point')
+  constructor(origin, xaxis, yaxis) {
+    super('Point')
     this.plane = new Plane(origin, xaxis, yaxis)
   }
 }
@@ -205,8 +205,8 @@ Object.defineProperties(GHPlane.prototype, {
 
 // Polyline Parameter (a Line is a Polyline with only 2 points)
 class GHPolyline extends GHParam {
-  constructor(id, points) {
-    super(id, 'Polyline')
+  constructor(points) {
+    super('Polyline')
     this.points = []
     for (var i = 0; i < points.length; i++) {
       this.points.push(new Vector(points[i].x, points[i].y, points[i].z))
@@ -257,8 +257,8 @@ Object.defineProperties(GHPolyline.prototype, {
 
 // Circle Parameter
 class GHCircle extends GHParam {
-  constructor(id, plane, r) {
-    super(id, 'Circle')
+  constructor(plane, r) {
+    super('Circle')
     this.pl = plane
     this.radius = r
   }
@@ -321,8 +321,8 @@ Object.defineProperties(GHCircle.prototype, {
 
 // Arc Parameter
 class GHArc extends GHParam {
-  constructor(id, plane, r, a1, a2) {
-    super(id, 'Arc')
+  constructor(plane, r, a1, a2) {
+    super('Arc')
     this.pl = plane
     this.radius = r
     this.angle_1 = a1  // oriented angle around zaxis from xaxis (pi>a1>0 )
@@ -412,6 +412,61 @@ Object.defineProperties(GHArc.prototype, {
         " O:" + this.pl.origin.str() + " & r: " + Math.round10(this.r,-display_decimal) +
         ' (' + Math.round10(this.a1*(180/3.1416),-1) + ', ' +  Math.round10(this.a2*(180/3.1416),-1) +')'
       )
+    }
+  }
+})
+
+// Curve Parameter (Poly Cubic Bezier)
+class GHCurve extends GHParam {
+  constructor(P, Q1, Q2) {
+    super('Curve')
+    this.p = P
+    this.q1 = Q1
+    this.q2 = Q2
+  }
+}
+Object.defineProperties(GHCurve.prototype, {
+  'count': {
+    get: function() { return this.p.length }
+  },
+  'length': {
+    get: function() {
+      return 0
+    }
+  },
+  'P': {
+    value: function() { return this.p }
+  },
+  'Q1': {
+    value: function() { return this.q1 }
+  },
+  'Q2': {
+    value: function() { return this.q2 }
+  },
+  'getData': {
+    value: function() { return {P:this.P, Q1:this.Q1, Q2:this.Q2} }
+  },
+  'setData': {
+    value: function(P,Q1,Q2) {
+      this._setData(P,Q1,Q2)
+      this.hasChanged()
+    }
+  },
+  '_setData': {
+    value: function(P,Q1,Q2) {
+      this.p = P
+      this.q1 = Q1
+      this.q2 = Q2
+    }
+  },
+  'print': {
+    value: function() {
+      var str = 'Curve[' + this.count + '] : ['
+      for (var i = 0; i < this.p.length; i++) {
+        str += this.p[i].str() + ', '
+      }
+      str += ']'
+      console.log(str)
     }
   }
 })

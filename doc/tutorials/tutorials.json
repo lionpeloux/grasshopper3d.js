@@ -3,6 +3,12 @@
     "title": "Draggable Point"
   },
   "cube3d": {
-    "title": "3D Cube "
+    "title": "3D Cube"
+  },
+  "midpoints": {
+    "title": "Midpoints"
+  },
+  "circle3pts": {
+    "title": "Circle from 3 points"
   }
 }

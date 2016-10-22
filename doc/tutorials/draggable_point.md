@@ -5,81 +5,40 @@ This is a draggable point.
 <div id='example'></div>
 
 ```
-// Define the paper sheet
-var width = 250;
-var height = 125;
-var paper = Snap(width,height);
-paper.attr({style:'display:block; margin:auto'})
-Snap('#example').append(paper)
+// define a new Solution and add 2 points
+var s = new GHSolution()
+var p1 = s.Point(0,0,0)
+var p2 = s.Point(100,-50,0)
 
-var proj = Matrix.identity()
-
-// create a master group to switch to cartesian coordinates
-var g = paper.g();
-g.attr({id:'cartesian'});
-g.attr({transform:'translate('+width/2+','+height/2+') scale(1,-1)'});
-
-// draw svg border box as a rectangle
-var box = paper.rect(-width/2, -height/2, width, height)
-               .attr({strokeWidth:'1px', stroke:'black', fill:'none'})
-g.add(box)
-
-// Create new Point parameter
-var p1 = new GHPoint('Point A', 0,0,0)
-
-// Attach an SVG circle to this point
-var p1_svg = new GHSvg_Point(paper, 'PointA',p1, 20).toGroup(g).addClass("node")
-
-// move p1 to (100, 0, 0)
-p1.x = 100
-p1.print()
-
-// move p1 to (100, 50, 0)
-p1.y = 50
-p1.print()
+// define a new Render 400x400px and add 2 svg circles two each points
+var r = new GHRender(400,400, '#example')
+var svg1 = r.Point(p1, 10).addClass('node-red')
+var svg2 = r.Point(p2, 50).addClass('node-blue')
 
 ```
 
 
 <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/snap.svg/0.4.1/snap.svg.js'></script>
-<script type='text/javascript' src='dist/lib/matrix.js'></script>
-<script type='text/javascript' src='dist/lib/vector.js'></script>
-<script type='text/javascript' src='dist/src/ghparam.js'></script>
-<script type='text/javascript' src='dist/src/ghcomp.js'></script>
-<script type='text/javascript' src='dist/src/ghsvg.js'></script>
-<link rel='stylesheet' type='text/css' href='dist/css/tutorials.css'>
+<script type='text/javascript' src='../../lib/matrix.js'></script>
+<script type='text/javascript' src='../../lib/vector.js'></script>
+<script type='text/javascript' src='../../lib/plane.js'></script>
+<script type='text/javascript' src='../../src/interpolation.js'></script>
+<script type='text/javascript' src='../../src/base.js'></script>
+<script type='text/javascript' src='../../src/ghparam.js'></script>
+<script type='text/javascript' src='../../src/ghcomp.js'></script>
+<script type='text/javascript' src='../../src/ghsvg.js'></script>
+<link rel='stylesheet' type='text/css' href='../../css/tutorials.css'>
+
 <script>
-  // Define the paper sheet
-  var width = 250;
-  var height = 125;
-  var paper = Snap(width,height);
-  paper.attr({style:'display:block; margin:auto'})
-  Snap('#example').append(paper)
 
-  var proj = Matrix.identity()
+  // define a new Solution and add 2 points
+  var s = new GHSolution()
+  var p1 = s.Point(0,0,0)
+  var p2 = s.Point(100,-50,0)
 
+  // define a new Render 400x400px and add 2 svg circles two each points
+  var r = new GHRender(400,400, '#example')
+  var svg1 = r.Point(p1, 10).addClass('node-red')
+  var svg2 = r.Point(p2, 50).addClass('node-blue')
 
-  // create a master group to switch to cartesian coordinates
-  var g = paper.g();
-  g.attr({id:'cartesian'});
-  g.attr({transform:'translate('+width/2+','+height/2+') scale(1,-1)'});
-
-  // draw svg border box as a rectangle
-  var box = paper.rect(-width/2, -height/2, width, height)
-                 .attr({strokeWidth:'2px', stroke:'black', fill:'none'})
-  g.add(box)
-
-  // Create new Point parameter
-  var p1 = new GHPoint('Point A', 0,0,0)
-
-  // Attach an SVG circle to this point
-  var p1_svg = new GHSvg_Point(paper, 'PointA',p1, 20).toGroup(g).addClass("node")
-
-  // move p1 to (100, 0, 0)
-  p1.x = 100
-  p1.print()
-
-  // move p1 to (100, 50, 0)
-  p1.y = 50
-  p1.print()
 </script>
