@@ -3,35 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_SVG"></script>
-    <script type="text/javascript" src="svg_mathjax.js"></script>
-    <script type="text/javascript"> new Svg_MathJax().install();</script>
+    <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.0/TweenLite.min.js'></script>
+    <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.0/TweenMax.min.js'></script>
+    <script type="text/javascript" src="../../lib/svgmathjax.js"></script>
+    <script type='text/javascript' src='../../lib/matrix.js'></script>
+    <script type='text/javascript' src='../../lib/vector.js'></script>
+    <script type='text/javascript' src='../../lib/plane.js'></script>
+    <script type='text/javascript' src='../../src/interpolation.js'></script>
+    <script type='text/javascript' src='../../src/base.js'></script>
+    <script type='text/javascript' src='../../src/ghparam.js'></script>
+    <script type='text/javascript' src='../../src/ghcomp.js'></script>
+    <script type='text/javascript' src='../../src/ghsvg.js'></script>
+    <link rel='stylesheet' type='text/css' href='../../css/tutorials.css'>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/snap.svg/0.4.1/snap.svg.js"></script>
-    <script type="text/javascript" src="./vector.js"></script>
-    <script type="text/javascript" src="./ghparam.js"></script>
-    <script type="text/javascript" src="./ghcomp.js"></script>
-    <link rel="stylesheet" type="text/css" href="../test.css">
 </head>
 <body>
   <script>
     // TEST SVG
-    var width = 400;
-    var height = 300;
-    var paper = Snap(width,height);
-    // // var g = paper.g();
-    // // g.attr({id:"cartesian"});
-    // // g.attr({transform:"translate("+width/2+","+height/2+") scale(1,-1)"});
-    var t1 = paper.text(100, 175, "$ a^2 + b^2 = c^2 $");
-    // // g.add(t1)
+    var r = new GHRender(600,400)
+    // g.attr({id:"cartesian"});
+    // g.attr({transform:"translate("+width/2+","+height/2+") scale(1,-1)"});
+    var t0 = r.paper.text(0, 0, "TEXTE").attr({id:'tag-0', textAnchor:'end'}).transform('scale(1,-1)')
+    t0.toDefs()
+    r.mastergrp.add(t0.use().attr({x:100, y:100})) // this is working
+
+
+
+    // var t1 = r.paper.text(0, 0, "a^2 + b^2 = c^2").attr({id:'tag-1', textAnchor:'middle'}).transform('scale(1,-1)')
+    // t1.toDefs()
+    // r.mastergrp.add(t1.use().attr({x:200, y:100})) // this is working
+
+    var t3 = r.paper.text(0, 0, '$ \\int_{a}^{b} x^2 dx $').attr({id:'tag-3', textAnchor:'start'}).transform('scale(1,-1)')
+    t3.toDefs()
+    var t3_1 = t3.use().attr({x:100, y:100})
+    r.mastergrp.add(t3_1)
+
+    // move the label to the origin, rotate & scale, and move back to the insertion point
+    t3_1.attr({transform:'translate(100,100) scale(2) rotate(30) translate(-100,-100)'})
+
+    r.mastergrp.add(r.paper.circle(0,0,10))
+    r.mastergrp.add(r.paper.circle(100,100,5))
+    r.mastergrp.add(r.paper.circle(300,200,5))
+
+
+    var putLabels = function(){
+
+      var el = Snap.select('#tag-3')
+      var scale =  0.80
+
+      var mathjax = Snap.select('#MathJax_SVG_glyphs')
+      console.log(mathjax.node.childNodes);
+
+      // move all MathJaxGlyphs to our svg in a dedicated group in the defs section
+      var mathjax_defs  = r.paper.group().attr({id:'mathJax_glyphs'}).toDefs()
+      var newParent     = document.getElementById('mathJax_glyphs')
+      var oldParent     = document.getElementById('MathJax_SVG_glyphs')
+      while (oldParent.childNodes.length > 0) {
+        newParent.appendChild(oldParent.childNodes[0]);
+      }
+      // for (var i = 0; i < array.length; i++) {
+      //   array[i]
+      // }
+
+      // r.defsgrp.add(select('#MathJax_SVG_glyphs'))
+      // el.attr({transform:'scale(1,-1)'})
+
+      // el.transform('scale(1,1)')
+      // var el = Snap.select('#tag-1')
+      // console.log(Snap.select('#tag-1'));
+      // var id = el.attr('id')
+      // var symbol = r.paper.group().attr({id:id})
+      // symbol.add(el).toDefs()
+      //
+      // var ti = symbol.use().attr({x:100, y:100}).attr({transform:'scale(1,-1)'})
+      // r.mastergrp.add(ti)
+      //
+
+
+
+      // for (var i = 0; i < 20; i++) {
+      //   var ti = symbol.use().attr({x:15*i, y:15*i})
+      //   g.add(ti)
+      // }
+    }
+
+    new SvgMathJax().install(putLabels)
+
+
+    // var tmove = t1.use().attr({x:0, y:0})
+    // g.add(tmove)
+
+    // console.log("sdsdsd");
+    // console.log(t1.transform().localMatrix)
+    // console.log(tmove.transform().localMatrix)
+    // t1.transform('r45')
+
+
+
+    // ANIMATE WITH GSAP
+    // var param = {val:0}
+    // var r = 100
+
+    // TweenMax.to(param, 2, {
+    //   val:180,
+    //   repeat: 5,
+    //   yoyo: true,
+    //   onUpdate:applyValue,
+    //   onUpdateParams:[param.val]
+    // })
+    //   function applyValue (val){
+    //     // rotate the object around z axis
+    //     angle = param.val * 3.14/180
+    //     console.log(angle);
+    //     a = r*Math.cos(angle);
+    //     b = r*Math.sin(angle);
+    //     t1.attr({scale:param.val/10})
+    //     tmove.attr({x:a, y:b})
+    // };
+
+    // var tex2svg = require( 'tex-equation-to-svg' );
+
 
   </script>
 
-  <svg xmlns="http://www.w3.org/2000/svg" width="400" height="300">
+  <!-- <svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"> -->
      <!-- center-align at x,y point: -->
-     <text font-size="11" x="100" y="175">\( a^2 + b^2 = c^2 \)</text>
+     <!-- <text font-size="11" x="100" y="175">\( a^2 + b^2 = c^2 \)</text> -->
      <!-- left-align at x,y point: -->
-     <text font-size="11" x="100" y="205">L\( a^2 + b^2 = c^2 \)</text>
+     <!-- <text font-size="11" x="100" y="205">L\( a^2 + b^2 = c^2 \)</text> -->
      <!-- right-align at x,y point: -->
-     <text font-size="11" x="100" y="235">R\( a^2 + b^2 = c^2 \)</text>
-  </svg>
+     <!-- <text font-size="11" x="100" y="235">R\( a^2 + b^2 = c^2 \)</text> -->
+  <!-- </svg> -->
+
+
 </body>
 </html>

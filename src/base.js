@@ -406,21 +406,27 @@ Object.defineProperties(GHSolution.prototype, {
  */
 class GHRender {
   constructor(width=710, height=400, htmltag){
+    this.name       = 'ghrender'
     this.viewport   =  Matrix.identity()  // global transformation matrix to apply for drawing 3D to 2D
     this.comp_svg = []                   // register all ghsvg instances in the current render
     this.isupdated  = true                // false if the render needs to be redrawn
 
     // create cartesian centered snap paper with a border
-
     this.width      = width
     this.height     = height
-    this.paper      = Snap(this.width,this.height)
+    this.paper      = Snap(this.width,this.height).attr({id:'ghrender'})
+                                                  .attr({preserveAspectRatio:"xMidYMid meet"})
+    this.defs       = this.paper.defs
+                      this.paper.defs.id = 'ghrender-defs'
     this.mastergrp  = this.paper.g()
                                 .attr({id:"cartesian"})
                                 .attr({transform:"translate("+this.width/2+","+this.height/2+") scale(1,-1)"})
+
     this.borderbox  = this.paper.rect(-this.width/2, -this.height/2, this.width, this.height)
                            .attr({strokeWidth:"1px", stroke:"black", fill:"none"})
     this.mastergrp.add(this.borderbox)
+
+    this.defsgrp = this.paper.g()
 
     // append the paper to the given htmltag
     if (htmltag === undefined) {} else {
